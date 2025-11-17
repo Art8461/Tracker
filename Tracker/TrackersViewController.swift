@@ -15,6 +15,7 @@ class TrackersViewController: UIViewController {
         let button = UIButton()
         button.setImage(UIImage(named: "Plus"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
+        
         return button
     }()
     private let dateButton: UIButton = {
@@ -90,6 +91,8 @@ class TrackersViewController: UIViewController {
         navigationController?.setNavigationBarHidden(true, animated: false)
         view.backgroundColor = .white
         setupLayout()
+        
+        plusButton.addTarget(self, action: #selector(addTapped), for: .touchUpInside)
     }
     
     
@@ -133,5 +136,13 @@ class TrackersViewController: UIViewController {
             emptyLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
         ])
     }
+    
+    @objc private func addTapped() {
+        let vc = CreateTrackerTypeViewController()
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .pageSheet
+        present(nav, animated: true)
+    }
+
 }
 
