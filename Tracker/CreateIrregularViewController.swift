@@ -1,13 +1,13 @@
 //
-//  CreateHabitViewController.swift
+//  CreateIrregularViewController.swift
 //  Tracker
 //
-//  Created by Artem Kuzmenko on 16.11.2025.
+//  Created by Artem Kuzmenko on 19.11.2025.
 //
 
 import UIKit
 
-final class CreateHabitViewController: UIViewController {
+final class CreateIrregularViewController: UIViewController {
     
     // MARK: - UI Elements
     
@@ -412,7 +412,7 @@ final class CreateHabitViewController: UIViewController {
 
 // MARK: - UITextFieldDelegate
 
-extension CreateHabitViewController: UITextViewDelegate {
+extension CreateIrregularViewController: UITextViewDelegate {
     // Показывать кнопку только если редактируешь И текст не пустой
     func textViewDidChange(_ textView: UITextView) {
         placeholderLabel.isHidden = !textView.text.isEmpty

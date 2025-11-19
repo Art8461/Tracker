@@ -26,7 +26,7 @@ final class CreateTrackerTypeViewController: UIViewController {
         button.setTitle("Привычка", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1.0), for: .normal)
-        button.backgroundColor = UIColor.systemGray6
+        button.backgroundColor = (UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0))
         button.layer.cornerRadius = 16
         button.addTarget(self, action: #selector(habitTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -38,7 +38,7 @@ final class CreateTrackerTypeViewController: UIViewController {
         button.setTitle("Нерегулярное событие", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1.0), for: .normal)
-        button.backgroundColor = UIColor.systemGray6
+        button.backgroundColor = (UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0))
         button.layer.cornerRadius = 16
         button.addTarget(self, action: #selector(irregularTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -68,11 +68,10 @@ final class CreateTrackerTypeViewController: UIViewController {
         view.addSubview(irregularButton)
 
         NSLayoutConstraint.activate([
-            // Заголовок сверху
+
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 27),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
-            // Кнопки по центру экрана
             habitButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -30),
             habitButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             habitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
@@ -103,22 +102,9 @@ final class CreateTrackerTypeViewController: UIViewController {
     }
 
     @objc private func irregularTapped() {
-        Router.shared.presentCreateIrregular()
-        dismiss(animated: true)
+        let vc = CreateIrregularViewController()
+        vc.modalPresentationStyle = .pageSheet
+        present(vc, animated: true)
     }
 
-    // MARK: - Router
-
-    final class Router {
-        static let shared = Router()
-        private init() {}
-
-        func presentCreateHabit() {
-            print("Router: открыть экран привычки")
-        }
-
-        func presentCreateIrregular() {
-            print("Router: открыть экран нерегулярного события")
-        }
-    }
 }
