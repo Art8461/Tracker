@@ -8,32 +8,27 @@
 import UIKit
 
 class TrackersViewController: UIViewController{
- 
+
     // MARK: - UI Elements
-    
-    private let plusButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(named: "Plus"), for: .normal)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
+
     private let datePicker: UIDatePicker = {
         let picker = UIDatePicker()
         picker.datePickerMode = .date
         picker.preferredDatePickerStyle = .compact
         picker.locale = Locale(identifier: "ru_RU")
         picker.translatesAutoresizingMaskIntoConstraints = false
+        picker.widthAnchor.constraint(equalToConstant: 110).isActive = true
+        picker.heightAnchor.constraint(equalToConstant: 34).isActive = true
         return picker
     }()
-    
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Трекеры"
-        label.font = UIFont.systemFont(ofSize: 34, weight: .bold)
-        label.textColor = UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
+
+    private lazy var addTrackerBarButtonItem: UIBarButtonItem = {
+        let item = UIBarButtonItem(image: UIImage(named: "Plus"),
+                                   style: .plain,
+                                   target: self,
+                                   action: #selector(addTapped))
+        item.tintColor = UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0)
+        return item
     }()
     
     private let searchBar: UISearchBar = {
@@ -59,7 +54,7 @@ class TrackersViewController: UIViewController{
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
     }()
-    
+
     private let emptyLabel: UILabel = {
         let label = UILabel()
         label.text = "Что будем отслеживать?"
@@ -83,26 +78,35 @@ class TrackersViewController: UIViewController{
         cv.translatesAutoresizingMaskIntoConstraints = false
         return cv
     }()
-    
+
     private var filteredCategories: [TrackerCategory] = []
     private var searchText: String = ""
     private let calendar = Calendar.current
+    var currentDate: Date = Date()
+    
+    private func configureNavigationBar() {
+        title = "Трекеры"
+        navigationItem.largeTitleDisplayMode = .always
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.leftBarButtonItem = addTrackerBarButtonItem
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
+    }
 
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationController?.setNavigationBarHidden(true, animated: false)
         view.backgroundColor = .white
-        
+        configureNavigationBar()
         setupLayout()
         searchBar.delegate = self
-        
-        plusButton.addTarget(self, action: #selector(addTapped), for: .touchUpInside)
+
         datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
         
         loadMockData()
+        currentDate = normalized(date: Date())
+        datePicker.date = currentDate
         applyFilters()
         
     }
@@ -111,28 +115,10 @@ class TrackersViewController: UIViewController{
     // MARK: - Layout
     private func setupLayout() {
         
-        view.addSubview(plusButton)
-        view.addSubview(titleLabel)
         view.addSubview(searchBar)
-        view.addSubview(datePicker)
         view.addSubview(collectionView)
-
-        
         NSLayoutConstraint.activate([
-            datePicker.centerYAnchor.constraint(equalTo: plusButton.centerYAnchor),
-            datePicker.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            datePicker.widthAnchor.constraint(equalToConstant: 90),
-            datePicker.heightAnchor.constraint(equalToConstant: 40),
-            
-            plusButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 1),
-            plusButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 7),
-            plusButton.widthAnchor.constraint(equalToConstant: 42),
-            plusButton.heightAnchor.constraint(equalToConstant: 42),
-            
-            titleLabel.topAnchor.constraint(equalTo: plusButton.bottomAnchor, constant: 1),
-            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            
-            searchBar.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 7),
+            searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
             searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
             searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
             searchBar.heightAnchor.constraint(equalToConstant: 36)
@@ -175,7 +161,7 @@ class TrackersViewController: UIViewController{
     }
     
     private func applyFilters() {
-        let selectedDate = datePicker.date
+        let selectedDate = currentDate
         let normalizedSearch = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         guard let weekday = Weekday.from(date: selectedDate, calendar: calendar) else {
             filteredCategories = []
@@ -200,38 +186,43 @@ class TrackersViewController: UIViewController{
     // MARK: - Actions
     
     @objc private func addTapped() {
-          let vc = CreateTrackerTypeViewController()
-          vc.creationDelegate = self
-          vc.availableCategories = categories.reduce(into: [String]()) { result, category in
-              if !result.contains(category.title) {
-                  result.append(category.title)
-              }
-          }
-          let nav = UINavigationController(rootViewController: vc)
-          nav.modalPresentationStyle = .pageSheet
-          present(nav, animated: true)
-      }
-      
-      @objc private func dateChanged() {
-          applyFilters()
-      }
+        let vc = CreateTrackerTypeViewController()
+        vc.creationDelegate = self
+        vc.availableCategories = categories.reduce(into: [String]()) { result, category in
+            if !result.contains(category.title) {
+                result.append(category.title)
+            }
+        }
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .pageSheet
+        present(nav, animated: true)
+    }
+    
+    @objc private func dateChanged() {
+        currentDate = normalized(date: datePicker.date)
+        applyFilters()
+    }
     
     // MARK: - Data
     var categories: [TrackerCategory] = []
     var completedTrackers: [TrackerRecord] = []
+    private var completedTrackerSet: Set<TrackerRecord> = []
 
     func complete(tracker: Tracker, on date: Date) {
         let normalizedDate = normalized(date: date)
-        guard !isTrackerCompleted(tracker, on: normalizedDate) else { return }
         let record = TrackerRecord(trackerId: tracker.id, date: normalizedDate)
+        guard !completedTrackerSet.contains(record) else { return }
         completedTrackers.append(record)
+        completedTrackerSet.insert(record)
     }
 
     func uncomplete(tracker: Tracker, on date: Date) {
         let normalizedDate = normalized(date: date)
+        let record = TrackerRecord(trackerId: tracker.id, date: normalizedDate)
         completedTrackers.removeAll {
             $0.trackerId == tracker.id && calendar.isDate($0.date, inSameDayAs: normalizedDate)
         }
+        completedTrackerSet.remove(record)
     }
 
     // Для теста 
@@ -268,9 +259,8 @@ class TrackersViewController: UIViewController{
     }
 
     private func isTrackerCompleted(_ tracker: Tracker, on date: Date) -> Bool {
-        return completedTrackers.contains {
-            $0.trackerId == tracker.id && calendar.isDate($0.date, inSameDayAs: date)
-        }
+        let record = TrackerRecord(trackerId: tracker.id, date: date)
+        return completedTrackerSet.contains(record)
     }
     
     private func completedCount(for tracker: Tracker) -> Int {
@@ -339,12 +329,12 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
         }
         
         let tracker = filteredCategories[indexPath.section].trackers[indexPath.item]
-        configureCell(cell, with: tracker, on: datePicker.date)
+        configureCell(cell, with: tracker, on: currentDate)
         
         cell.plusAction = { [weak self, weak collectionView, weak cell] in
             guard let self = self else { return }
-            guard !self.isFuture(date: self.datePicker.date) else { return }
-            let targetDate = self.normalized(date: self.datePicker.date)
+            guard !self.isFuture(date: self.currentDate) else { return }
+            let targetDate = self.normalized(date: self.currentDate)
             if self.isTrackerCompleted(tracker, on: targetDate) {
                 self.uncomplete(tracker: tracker, on: targetDate)
             } else {
@@ -352,7 +342,7 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
             }
             
             if let cell = cell {
-                self.configureCell(cell, with: tracker, on: self.datePicker.date)
+                self.configureCell(cell, with: tracker, on: self.currentDate)
             }
             
             guard let collectionView = collectionView else {
@@ -415,11 +405,16 @@ extension TrackersViewController: UISearchBarDelegate {
 
 extension TrackersViewController: TrackerCreationDelegate {
     func trackerCreationDidCreate(_ tracker: Tracker, in categoryTitle: String) {
-        if let index = categories.firstIndex(where: { $0.title == categoryTitle }) {
-            categories[index].trackers.append(tracker)
+        var updatedCategories = categories
+        if let index = updatedCategories.firstIndex(where: { $0.title == categoryTitle }) {
+            var trackers = updatedCategories[index].trackers
+            trackers.append(tracker)
+            let updatedCategory = TrackerCategory(title: categoryTitle, trackers: trackers)
+            updatedCategories[index] = updatedCategory
         } else {
-            categories.append(TrackerCategory(title: categoryTitle, trackers: [tracker]))
+            updatedCategories.append(TrackerCategory(title: categoryTitle, trackers: [tracker]))
         }
+        categories = updatedCategories
         applyFilters()
     }
 }

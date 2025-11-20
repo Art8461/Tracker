@@ -68,12 +68,12 @@ extension Weekday {
 
 struct TrackerCategory {
     let title: String
-    var trackers: [Tracker]
+    let trackers: [Tracker]
 }
 
 // MARK: - TrackerRecord
 
-struct TrackerRecord {
+struct TrackerRecord: Hashable {
     let trackerId: UUID
     let date: Date
 }
