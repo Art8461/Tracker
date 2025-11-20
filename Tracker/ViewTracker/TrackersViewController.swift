@@ -305,6 +305,21 @@ class TrackersViewController: UIViewController{
     private func color(for tracker: Tracker) -> UIColor {
         return UIColor(hex: tracker.colorHex) ?? UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
     }
+    
+    private func configureCell(_ cell: TrackerCell, with tracker: Tracker, on date: Date) {
+        let normalizedDate = normalized(date: date)
+        let isCompleted = isTrackerCompleted(tracker, on: normalizedDate)
+        let count = completedCount(for: tracker)
+        let daysText = formattedDaysText(for: count)
+        let color = color(for: tracker)
+        let buttonEnabled = !isFuture(date: date)
+        
+        cell.configure(with: tracker,
+                       daysText: daysText,
+                       color: color,
+                       isCompleted: isCompleted,
+                       isButtonEnabled: buttonEnabled)
+    }
 
   }
 
@@ -324,21 +339,9 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
         }
         
         let tracker = filteredCategories[indexPath.section].trackers[indexPath.item]
-        let selectedDate = datePicker.date
-        let normalizedDate = normalized(date: selectedDate)
-        let isCompleted = isTrackerCompleted(tracker, on: normalizedDate)
-        let count = completedCount(for: tracker)
-        let daysText = formattedDaysText(for: count)
-        let color = color(for: tracker)
-        let buttonEnabled = !isFuture(date: selectedDate)
+        configureCell(cell, with: tracker, on: datePicker.date)
         
-        cell.configure(with: tracker,
-                       daysText: daysText,
-                       color: color,
-                       isCompleted: isCompleted,
-                       isButtonEnabled: buttonEnabled)
-        
-        cell.plusAction = { [weak self, weak collectionView] in
+        cell.plusAction = { [weak self, weak collectionView, weak cell] in
             guard let self = self else { return }
             guard !self.isFuture(date: self.datePicker.date) else { return }
             let targetDate = self.normalized(date: self.datePicker.date)
@@ -347,6 +350,11 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
             } else {
                 self.complete(tracker: tracker, on: targetDate)
             }
+            
+            if let cell = cell {
+                self.configureCell(cell, with: tracker, on: self.datePicker.date)
+            }
+            
             guard let collectionView = collectionView else {
                 self.collectionView.reloadData()
                 return
