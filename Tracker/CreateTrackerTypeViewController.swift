@@ -10,6 +10,9 @@ import UIKit
 final class CreateTrackerTypeViewController: UIViewController {
 
     // MARK: - UI Elements
+    
+    weak var creationDelegate: TrackerCreationDelegate?
+    var availableCategories: [String] = []
 
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -58,6 +61,7 @@ final class CreateTrackerTypeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setupSheet()
+        navigationController?.setNavigationBarHidden(true, animated: animated)
     }
 
     // MARK: - Setup UI
@@ -97,14 +101,16 @@ final class CreateTrackerTypeViewController: UIViewController {
 
     @objc private func habitTapped() {
         let vc = CreateHabitViewController()
-        vc.modalPresentationStyle = .pageSheet
-        present(vc, animated: true)
+        vc.creationDelegate = creationDelegate
+        vc.availableCategories = availableCategories
+        navigationController?.pushViewController(vc, animated: true)
     }
 
     @objc private func irregularTapped() {
         let vc = CreateIrregularViewController()
-        vc.modalPresentationStyle = .pageSheet
-        present(vc, animated: true)
+        vc.creationDelegate = creationDelegate
+        vc.availableCategories = availableCategories
+        navigationController?.pushViewController(vc, animated: true)
     }
 
 }

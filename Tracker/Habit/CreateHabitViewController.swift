@@ -129,7 +129,7 @@ final class CreateHabitViewController: UIViewController {
         button.setTitle("Создать", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor.systemGray
+        button.backgroundColor = UIColor(red: 174/255, green: 175/255, blue: 180/255, alpha: 1.0)
         button.layer.cornerRadius = 16
         button.isEnabled = false
         button.addTarget(self, action: #selector(createTapped), for: .touchUpInside)
@@ -139,13 +139,19 @@ final class CreateHabitViewController: UIViewController {
     
     // MARK: - Properties
     
+    weak var creationDelegate: TrackerCreationDelegate?
+    var availableCategories: [String] = []
+    
     private var selectedCategory: String? {
         didSet { updateCategorySubtitle() }
     }
     
-    private var selectedSchedule: [String]? {
+    private var selectedSchedule: [Weekday] = [] {
         didSet { updateScheduleSubtitle() }
     }
+    
+    private let emojiOptions = ["🙂", "😌", "😎", "😴", "🧘‍♂️", "📚", "🌿", "🏃‍♂️", "😺"]
+    private let colorOptions = ["#FD4C49", "#34C759", "#FF9500", "#AF52DE", "#007AFF", "#4ECDC4"]
     
     private let nameLimit = 38
     
@@ -156,6 +162,11 @@ final class CreateHabitViewController: UIViewController {
         view.backgroundColor = .white
         configureUI()
         setupKeyboardObservers()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
     }
     
     
@@ -300,8 +311,19 @@ final class CreateHabitViewController: UIViewController {
     }
     
     private func updateScheduleSubtitle() {
-        let text = selectedSchedule?.joined(separator: ", ")
-        updateButton(scheduleButton, subtitle: text)
+        guard !selectedSchedule.isEmpty else {
+            updateButton(scheduleButton, subtitle: nil)
+            return
+        }
+        if selectedSchedule.count == Weekday.allCases.count {
+            updateButton(scheduleButton, subtitle: "Каждый день")
+        } else {
+            let text = selectedSchedule
+                .sorted { $0.rawValue < $1.rawValue }
+                .map { $0.shortTitle }
+                .joined(separator: ", ")
+            updateButton(scheduleButton, subtitle: text)
+        }
     }
     
     private func updateButton(_ button: UIButton, subtitle: String?) {
@@ -342,6 +364,7 @@ final class CreateHabitViewController: UIViewController {
         )
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
     }
     
@@ -376,36 +399,63 @@ final class CreateHabitViewController: UIViewController {
     }
     
     @objc private func categoryTapped() {
-        print("Переход к выбору категории")
-        
-        selectedCategory = "Важное"   // DEMO
+        let controller = CategorySelectionViewController(categories: availableCategories,
+                                                         selectedCategory: selectedCategory)
+        controller.delegate = self
+        let nav = UINavigationController(rootViewController: controller)
+        present(nav, animated: true)
     }
     
     @objc private func scheduleTapped() {
-        print("Переход к выбору расписания")
-        
-        selectedSchedule = ["Пн", "Ср", "Пт"] // DEMO
+        let controller = ScheduleViewController(selectedWeekdays: Set(selectedSchedule))
+        controller.delegate = self
+        let nav = UINavigationController(rootViewController: controller)
+        present(nav, animated: true)
     }
     
     @objc private func cancelTapped() {
-        dismiss(animated: true)
+        dismissCreationFlow()
     }
     
     @objc private func createTapped() {
-        print("Создание привычки")
-        dismiss(animated: true)
+        guard
+            let title = nameTextView.text?.trimmingCharacters(in: .whitespacesAndNewlines),
+            !title.isEmpty,
+            let category = selectedCategory,
+            !selectedSchedule.isEmpty
+        else { return }
+        
+        let emoji = emojiOptions.randomElement() ?? "🙂"
+        let colorHex = colorOptions.randomElement() ?? "#34C759"
+        let tracker = Tracker(id: UUID(),
+                              title: title,
+                              colorHex: colorHex,
+                              emoji: emoji,
+                              schedule: selectedSchedule)
+        creationDelegate?.trackerCreationDidCreate(tracker, in: category)
+        dismissCreationFlow()
     }
     
     
     private func validateForm() {
         let nameValid = !(nameTextView.text?.isEmpty ?? true)
         let categoryValid = selectedCategory != nil
-        let scheduleValid = selectedSchedule?.isEmpty == false
+        let scheduleValid = !selectedSchedule.isEmpty
         
         let valid = nameValid && categoryValid && scheduleValid
         
         createButton.isEnabled = valid
-        createButton.backgroundColor = valid ? UIColor.systemBlue : UIColor.systemGray
+        createButton.backgroundColor = valid
+            ? UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0)
+            : UIColor(red: 174/255, green: 175/255, blue: 180/255, alpha: 1.0)
+    }
+    
+    private func dismissCreationFlow() {
+        if let nav = navigationController {
+            nav.dismiss(animated: true)
+        } else {
+            dismiss(animated: true)
+        }
     }
 }
 
@@ -443,4 +493,24 @@ extension CreateHabitViewController: UITextViewDelegate {
             characterLimitLabel.isHidden = updatedText.count <= nameLimit
             return updatedText.count <= nameLimit
         }
+}
+
+// MARK: - CategorySelectionViewControllerDelegate
+
+extension CreateHabitViewController: CategorySelectionViewControllerDelegate {
+    func categorySelection(_ viewController: CategorySelectionViewController,
+                           didSelect category: String,
+                           categories: [String]) {
+        availableCategories = categories
+        selectedCategory = category
+    }
+}
+
+// MARK: - ScheduleViewControllerDelegate
+
+extension CreateHabitViewController: ScheduleViewControllerDelegate {
+    func scheduleViewController(_ viewController: ScheduleViewController,
+                                didUpdate weekdays: [Weekday]) {
+        selectedSchedule = weekdays
+    }
 }

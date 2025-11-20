@@ -39,9 +39,9 @@ final class CreateIrregularViewController: UIViewController {
         textView.textColor = UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0)
         textView.backgroundColor = UIColor(red: 230/255, green: 232/255, blue: 235/255, alpha: 0.3)
         textView.layer.cornerRadius = 16
-        textView.textContainerInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 45) // Оставляем место справа
+        textView.textContainerInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 45)
         textView.delegate = self
-        textView.isScrollEnabled = false // Чтобы размер ячейки менялся под текст
+        textView.isScrollEnabled = false
         textView.translatesAutoresizingMaskIntoConstraints = false
         return textView
     }()
@@ -94,22 +94,6 @@ final class CreateIrregularViewController: UIViewController {
         return button
     }()
     
-    private lazy var scheduleButton: UIButton = {
-        let button = createSelectionButton(title: "Расписание", subtitle: nil)
-        button.addTarget(self, action: #selector(scheduleTapped), for: .touchUpInside)
-        button.backgroundColor = UIColor(red: 230/255, green: 232/255, blue: 235/255, alpha: 0.3)
-        button.layer.cornerRadius = 16
-        button.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-        return button
-    }()
-    
-    private let separatorView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(red: 174/255, green: 175/255, blue: 180/255, alpha: 1.0)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Отменить", for: .normal)
@@ -139,13 +123,15 @@ final class CreateIrregularViewController: UIViewController {
     
     // MARK: - Properties
     
+    weak var creationDelegate: TrackerCreationDelegate?
+    var availableCategories: [String] = []
+    
     private var selectedCategory: String? {
         didSet { updateCategorySubtitle() }
     }
     
-    private var selectedSchedule: [String]? {
-        didSet { updateScheduleSubtitle() }
-    }
+    private let emojiOptions = ["🙂", "😌", "😎", "😴", "🧘‍♂️", "📚", "🌿", "🏃‍♂️", "😺"]
+    private let colorOptions = ["#FD4C49", "#34C759", "#FF9500", "#AF52DE", "#007AFF", "#4ECDC4"]
     
     private let nameLimit = 38
     
@@ -156,6 +142,11 @@ final class CreateIrregularViewController: UIViewController {
         view.backgroundColor = .white
         configureUI()
         setupKeyboardObservers()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
     }
     
     
@@ -170,8 +161,6 @@ final class CreateIrregularViewController: UIViewController {
         contentView.addSubview(titleLabel)
         contentView.addSubview(nameContainer)
         contentView.addSubview(categoryButton)
-        contentView.addSubview(separatorView)
-        contentView.addSubview(scheduleButton)
         
         nameContainer.addArrangedSubview(nameTextView)
         nameContainer.addArrangedSubview(characterLimitLabel)
@@ -213,17 +202,8 @@ final class CreateIrregularViewController: UIViewController {
             categoryButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             categoryButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             categoryButton.heightAnchor.constraint(equalToConstant: 75),
+            categoryButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
             
-            separatorView.centerYAnchor.constraint(equalTo: categoryButton.bottomAnchor),
-            separatorView.leadingAnchor.constraint(equalTo: categoryButton.leadingAnchor, constant: 16),
-            separatorView.trailingAnchor.constraint(equalTo: categoryButton.trailingAnchor, constant: -16),
-            separatorView.heightAnchor.constraint(equalToConstant: 0.5),
-            
-            scheduleButton.topAnchor.constraint(equalTo: categoryButton.bottomAnchor),
-            scheduleButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            scheduleButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            scheduleButton.heightAnchor.constraint(equalToConstant: 75),
-            scheduleButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
             
             cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             cancelButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
@@ -299,11 +279,6 @@ final class CreateIrregularViewController: UIViewController {
         updateButton(categoryButton, subtitle: selectedCategory)
     }
     
-    private func updateScheduleSubtitle() {
-        let text = selectedSchedule?.joined(separator: ", ")
-        updateButton(scheduleButton, subtitle: text)
-    }
-    
     private func updateButton(_ button: UIButton, subtitle: String?) {
         guard let stack = button.subviews.first(where: { $0 is UIStackView }) as? UIStackView else { return }
         
@@ -342,6 +317,7 @@ final class CreateIrregularViewController: UIViewController {
         )
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
     }
     
@@ -376,15 +352,11 @@ final class CreateIrregularViewController: UIViewController {
     }
     
     @objc private func categoryTapped() {
-        print("Переход к выбору категории")
-        
-        selectedCategory = "Важное"   // DEMO
-    }
-    
-    @objc private func scheduleTapped() {
-        print("Переход к выбору расписания")
-        
-        selectedSchedule = ["Пн", "Ср", "Пт"] // DEMO
+        let controller = CategorySelectionViewController(categories: availableCategories,
+                                                         selectedCategory: selectedCategory)
+        controller.delegate = self
+        let nav = UINavigationController(rootViewController: controller)
+        present(nav, animated: true)
     }
     
     @objc private func cancelTapped() {
@@ -392,7 +364,20 @@ final class CreateIrregularViewController: UIViewController {
     }
     
     @objc private func createTapped() {
-        print("Создание привычки")
+        guard
+            let title = nameTextView.text?.trimmingCharacters(in: .whitespacesAndNewlines),
+            !title.isEmpty,
+            let category = selectedCategory
+        else { return }
+        
+        let emoji = emojiOptions.randomElement() ?? "🙂"
+        let colorHex = colorOptions.randomElement() ?? "#34C759"
+        let tracker = Tracker(id: UUID(),
+                              title: title,
+                              colorHex: colorHex,
+                              emoji: emoji,
+                              schedule: [])
+        creationDelegate?.trackerCreationDidCreate(tracker, in: category)
         dismiss(animated: true)
     }
     
@@ -400,12 +385,13 @@ final class CreateIrregularViewController: UIViewController {
     private func validateForm() {
         let nameValid = !(nameTextView.text?.isEmpty ?? true)
         let categoryValid = selectedCategory != nil
-        let scheduleValid = selectedSchedule?.isEmpty == false
         
-        let valid = nameValid && categoryValid && scheduleValid
+        let valid = nameValid && categoryValid
         
         createButton.isEnabled = valid
-        createButton.backgroundColor = valid ? UIColor.systemBlue : UIColor.systemGray
+        createButton.backgroundColor = valid
+            ? UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0)
+            : UIColor(red: 174/255, green: 175/255, blue: 180/255, alpha: 1.0)
     }
 }
 
@@ -443,4 +429,15 @@ extension CreateIrregularViewController: UITextViewDelegate {
             characterLimitLabel.isHidden = updatedText.count <= nameLimit
             return updatedText.count <= nameLimit
         }
+}
+
+// MARK: - CategorySelectionViewControllerDelegate
+
+extension CreateIrregularViewController: CategorySelectionViewControllerDelegate {
+    func categorySelection(_ viewController: CategorySelectionViewController,
+                           didSelect category: String,
+                           categories: [String]) {
+        availableCategories = categories
+        selectedCategory = category
+    }
 }

@@ -7,52 +7,184 @@
 
 import UIKit
 
-
 final class TrackerCell: UICollectionViewCell {
     static let identifier = "TrackerCell"
     
-    let titleLabel = UILabel()
-    let emojiLabel = UILabel()
-    let plusButton = UIButton(type: .system)
+    // MARK: - UI
+    
+    private let containerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.cornerRadius = 16
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    private let colorView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.cornerRadius = 16
+        view.layer.masksToBounds = true
+        return view
+    }()
+    
+    private let footerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 16
+        view.layer.masksToBounds = true
+        return view
+    }()
+    
+    private let emojiBackground: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.3)
+        view.layer.cornerRadius = 17
+        view.layer.masksToBounds = true
+        return view
+    }()
+    
+    private let emojiLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 24)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 17, weight: .medium)
+        label.textColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1.0)
+        label.numberOfLines = 2
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let daysLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.textColor = UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var plusButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.tintColor = .white
+        button.addTarget(self, action: #selector(didTapPlus), for: .touchUpInside)
+        button.heightAnchor.constraint(equalToConstant: 34).isActive = true
+        button.widthAnchor.constraint(equalToConstant: 34).isActive = true
+        button.layer.cornerRadius = 17
+        button.clipsToBounds = true
+        return button
+    }()
     
     var plusAction: (() -> Void)?
     
+    // MARK: - Init
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = UIColor(red: 242/255, green: 242/255, blue: 247/255, alpha: 1.0)
-        contentView.layer.cornerRadius = 12
-        contentView.clipsToBounds = true
-        
-        emojiLabel.font = .systemFont(ofSize: 28)
-        emojiLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        titleLabel.font = .systemFont(ofSize: 16, weight: .medium)
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        plusButton.setTitle("+", for: .normal)
-        plusButton.titleLabel?.font = .boldSystemFont(ofSize: 24)
-        plusButton.translatesAutoresizingMaskIntoConstraints = false
-        plusButton.addTarget(self, action: #selector(didTapPlus), for: .touchUpInside)
-        
-        contentView.addSubview(emojiLabel)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(plusButton)
+        contentView.backgroundColor = .clear
+        setupLayout()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        plusAction = nil
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        containerView.layer.shadowPath = UIBezierPath(roundedRect: containerView.bounds, cornerRadius: 16).cgPath
+    }
+    
+    // MARK: - Layout
+    
+    private func setupLayout() {
+        contentView.addSubview(containerView)
+        containerView.addSubview(colorView)
+        containerView.addSubview(footerView)
+        colorView.addSubview(emojiBackground)
+        emojiBackground.addSubview(emojiLabel)
+        colorView.addSubview(titleLabel)
+        footerView.addSubview(daysLabel)
+        footerView.addSubview(plusButton)
         
         NSLayoutConstraint.activate([
-            emojiLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
-            emojiLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            containerView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
-            titleLabel.leadingAnchor.constraint(equalTo: emojiLabel.trailingAnchor, constant: 12),
-            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            colorView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            colorView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            colorView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            colorView.heightAnchor.constraint(equalToConstant: 90),
             
-            plusButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
-            plusButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            footerView.topAnchor.constraint(equalTo: colorView.bottomAnchor),
+            footerView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            footerView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            footerView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+            footerView.heightAnchor.constraint(equalToConstant: 58),
+            
+            emojiBackground.topAnchor.constraint(equalTo: colorView.topAnchor, constant: 12),
+            emojiBackground.leadingAnchor.constraint(equalTo: colorView.leadingAnchor, constant: 12),
+            emojiBackground.heightAnchor.constraint(equalToConstant: 34),
+            emojiBackground.widthAnchor.constraint(equalToConstant: 34),
+            
+            emojiLabel.centerXAnchor.constraint(equalTo: emojiBackground.centerXAnchor),
+            emojiLabel.centerYAnchor.constraint(equalTo: emojiBackground.centerYAnchor),
+            
+            titleLabel.leadingAnchor.constraint(equalTo: colorView.leadingAnchor, constant: 12),
+            titleLabel.trailingAnchor.constraint(equalTo: colorView.trailingAnchor, constant: -12),
+            titleLabel.bottomAnchor.constraint(equalTo: colorView.bottomAnchor, constant: -12),
+            
+            daysLabel.centerYAnchor.constraint(equalTo: footerView.centerYAnchor),
+            daysLabel.leadingAnchor.constraint(equalTo: footerView.leadingAnchor, constant: 16),
+            
+            plusButton.centerYAnchor.constraint(equalTo: footerView.centerYAnchor),
+            plusButton.trailingAnchor.constraint(equalTo: footerView.trailingAnchor, constant: -16)
         ])
     }
+    
+    // MARK: - Configure
+    
+    func configure(with tracker: Tracker,
+                   daysText: String,
+                   color: UIColor,
+                   isCompleted: Bool,
+                   isButtonEnabled: Bool) {
+        colorView.backgroundColor = color
+        titleLabel.text = tracker.title
+        emojiLabel.text = tracker.emoji
+        daysLabel.text = daysText
+        updatePlusButton(color: color, isCompleted: isCompleted, isEnabled: isButtonEnabled)
+    }
+    
+    private func updatePlusButton(color: UIColor, isCompleted: Bool, isEnabled: Bool) {
+        let symbolName = isCompleted ? "checkmark" : "plus"
+        let configuration = UIImage.SymbolConfiguration(pointSize: 13, weight: .bold)
+        plusButton.setImage(UIImage(systemName: symbolName, withConfiguration: configuration), for: .normal)
+        plusButton.backgroundColor = color
+        plusButton.isEnabled = isEnabled
+        if isEnabled {
+            plusButton.alpha = isCompleted ? 0.3 : 1.0
+        } else {
+            plusButton.alpha = 0.3
+        }
+    }
+    
+    // MARK: - Actions
     
     @objc private func didTapPlus() {
         plusAction?()
     }
-    
-    required init?(coder: NSCoder) { fatalError() }
 }

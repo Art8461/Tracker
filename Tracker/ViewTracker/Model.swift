@@ -30,11 +30,45 @@ enum Weekday: Int, CaseIterable, Codable {
     case sunday
 }
 
+extension Weekday {
+    var localizedName: String {
+        switch self {
+        case .monday: return "Понедельник"
+        case .tuesday: return "Вторник"
+        case .wednesday: return "Среда"
+        case .thursday: return "Четверг"
+        case .friday: return "Пятница"
+        case .saturday: return "Суббота"
+        case .sunday: return "Воскресенье"
+        }
+    }
+    
+    var shortTitle: String {
+        switch self {
+        case .monday: return "Пн"
+        case .tuesday: return "Вт"
+        case .wednesday: return "Ср"
+        case .thursday: return "Чт"
+        case .friday: return "Пт"
+        case .saturday: return "Сб"
+        case .sunday: return "Вс"
+        }
+    }
+    
+    static func from(date: Date, calendar: Calendar = Calendar.current) -> Weekday? {
+        let weekday = calendar.component(.weekday, from: date)
+        // Calendar weekday: 1 - Sunday ... 7 - Saturday. Need Monday = 1
+        // Convert to ISO weekday where Monday = 1
+        let isoWeekday = ((weekday + 5) % 7) + 1
+        return Weekday(rawValue: isoWeekday)
+    }
+}
+
 // MARK: - TrackerCategory
 
 struct TrackerCategory {
     let title: String
-    let trackers: [Tracker]
+    var trackers: [Tracker]
 }
 
 // MARK: - TrackerRecord
