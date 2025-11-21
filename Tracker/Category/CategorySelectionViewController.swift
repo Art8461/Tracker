@@ -29,7 +29,7 @@ final class CategorySelectionViewController: UIViewController {
         didSet { updateDoneButtonState() }
     }
     
-    private let tableBackgroundColor = UIColor(red: 230/255, green: 232/255, blue: 235/255, alpha: 0.3)
+    private let tableBackgroundColor = UIColor(named: "GrayOsn")
     
     private lazy var tableView: UITableView = {
         let table = UITableView(frame: .zero, style: .insetGrouped)
@@ -46,7 +46,7 @@ final class CategorySelectionViewController: UIViewController {
         button.setTitle("Готово", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0)
+        button.backgroundColor = UIColor(named: "Black")
         button.layer.cornerRadius = 16
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(doneTapped), for: .touchUpInside)
@@ -82,7 +82,7 @@ final class CategorySelectionViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CategoryCell")
-        tableView.backgroundColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1.0)
+        tableView.backgroundColor = UIColor(named: "White")
         view.addSubview(tableView)
         
         NSLayoutConstraint.activate([
@@ -201,7 +201,7 @@ extension CategorySelectionViewController: UITableViewDataSource {
             cell.accessoryType = category == selectedCategory ? .checkmark : .none
         case .addCategory:
             cell.textLabel?.text = "Добавить категорию"
-            cell.textLabel?.textColor = UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0)
+            cell.textLabel?.textColor = UIColor(named: "Black")
             cell.accessoryType = .disclosureIndicator
         }
         cell.backgroundColor = tableBackgroundColor

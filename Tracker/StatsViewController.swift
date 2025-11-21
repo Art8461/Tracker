@@ -19,7 +19,7 @@ class StatsViewController: UIViewController {
         let label = UILabel()
         label.text = "Анализировать пока нечего"
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        label.textColor = UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0)
+        label.textColor = UIColor(named: "Black")
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label

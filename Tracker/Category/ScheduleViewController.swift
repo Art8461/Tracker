@@ -20,14 +20,14 @@ final class ScheduleViewController: UIViewController {
     
     private var selectedWeekdays: Set<Weekday>
     
-    private let tableBackgroundColor = UIColor(red: 230/255, green: 232/255, blue: 235/255, alpha: 0.3)
+    private let tableBackgroundColor = UIColor(named: "GrayOsn")
     
     private lazy var tableView: UITableView = {
         let table = UITableView(frame: .zero, style: .insetGrouped)
         table.translatesAutoresizingMaskIntoConstraints = false
         table.separatorStyle = .singleLine
         table.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        table.backgroundColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1.0)
+        table.backgroundColor = UIColor(named: "White")
         table.tableHeaderView = UIView(frame: .zero)
         table.tableFooterView = UIView(frame: .zero)
         return table
@@ -38,7 +38,7 @@ final class ScheduleViewController: UIViewController {
         button.setTitle("Готово", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0)
+        button.backgroundColor = UIColor(named: "Black")
         button.layer.cornerRadius = 16
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(doneTapped), for: .touchUpInside)
@@ -132,7 +132,7 @@ extension ScheduleViewController: UITableViewDataSource {
         toggle.tag = weekday.rawValue
         toggle.onTintColor = UIColor(red: 55/255, green: 114/255, blue: 231/255, alpha: 1.0)
         toggle.thumbTintColor = .white
-        toggle.backgroundColor = UIColor(red: 230/255, green: 232/255, blue: 235/255, alpha: 1.0)
+        toggle.backgroundColor = UIColor(named: "GrayOsn100")
         toggle.layer.cornerRadius = 16
         toggle.clipsToBounds = true
         toggle.addTarget(self, action: #selector(switchChanged(_:)), for: .valueChanged)

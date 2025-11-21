@@ -28,7 +28,7 @@ final class CreateIrregularViewController: UIViewController {
         label.text = "Новая привычка"
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
-        label.textColor = UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0)
+        label.textColor = UIColor(named: "Black")
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -36,8 +36,8 @@ final class CreateIrregularViewController: UIViewController {
     private lazy var nameTextView: UITextView = {
         let textView = UITextView()
         textView.font = .systemFont(ofSize: 17)
-        textView.textColor = UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0)
-        textView.backgroundColor = UIColor(red: 230/255, green: 232/255, blue: 235/255, alpha: 0.3)
+        textView.textColor = UIColor(named: "Black")
+        textView.backgroundColor = UIColor(named: "GrayOsn")
         textView.layer.cornerRadius = 16
         textView.textContainerInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 45)
         textView.delegate = self
@@ -50,7 +50,7 @@ final class CreateIrregularViewController: UIViewController {
         let label = UILabel()
         label.text = "Введите название трекера"
         label.font = .systemFont(ofSize: 17)
-        label.textColor = UIColor(red: 174/255, green: 175/255, blue: 180/255, alpha: 1.0)
+        label.textColor = UIColor(named: "Gray")
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -58,7 +58,7 @@ final class CreateIrregularViewController: UIViewController {
     private lazy var clearTextViewButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "xmark.circle"), for: .normal)
-        button.tintColor = UIColor(red: 174/255, green: 175/255, blue: 180/255, alpha: 1.0)
+        button.tintColor = UIColor(named: "Gray")
         button.addTarget(self, action: #selector(clearTextViewText), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -70,7 +70,7 @@ final class CreateIrregularViewController: UIViewController {
         let label = UILabel()
         label.text = "Ограничение 38 символов"
         label.font = .systemFont(ofSize: 17)
-        label.textColor = UIColor(red: 245/255, green: 107/255, blue: 108/255, alpha: 1.0)
+        label.textColor = UIColor(named: "Red")
         label.textAlignment = .center
         label.isHidden = true
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -88,7 +88,7 @@ final class CreateIrregularViewController: UIViewController {
     private lazy var categoryButton: UIButton = {
         let button = createSelectionButton(title: "Категория", subtitle: nil)
         button.addTarget(self, action: #selector(categoryTapped), for: .touchUpInside)
-        button.backgroundColor = UIColor(red: 230/255, green: 232/255, blue: 235/255, alpha: 0.3)
+        button.backgroundColor = UIColor(named: "GrayOsn")
         button.layer.cornerRadius = 16
         button.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         return button
@@ -102,7 +102,7 @@ final class CreateIrregularViewController: UIViewController {
         button.backgroundColor = .white
         button.layer.cornerRadius = 16
         button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.systemRed.cgColor
+        button.layer.borderColor = UIColor (named: "Red")
         button.addTarget(self, action: #selector(cancelTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -113,7 +113,7 @@ final class CreateIrregularViewController: UIViewController {
         button.setTitle("Создать", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor.systemGray
+        button.backgroundColor = UIColor (named : "GrayButton")
         button.layer.cornerRadius = 16
         button.isEnabled = false
         button.addTarget(self, action: #selector(createTapped), for: .touchUpInside)
@@ -239,7 +239,7 @@ final class CreateIrregularViewController: UIViewController {
         let mainTitle = UILabel()
         mainTitle.text = title
         mainTitle.font = .systemFont(ofSize: 17)
-        mainTitle.textColor = UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0)
+        mainTitle.textColor = UIColor(named: "Black")
         
         stackView.addArrangedSubview(mainTitle)
         
@@ -254,7 +254,7 @@ final class CreateIrregularViewController: UIViewController {
         button.addSubview(stackView)
         
         let chevron = UIImageView(image: UIImage(named: "Right"))
-        chevron.tintColor = UIColor(red: 174/255, green: 175/255, blue: 180/255, alpha: 1.0)
+        chevron.tintColor = UIColor(named: "Gray")
         chevron.translatesAutoresizingMaskIntoConstraints = false
         button.addSubview(chevron)
         
@@ -390,8 +390,8 @@ final class CreateIrregularViewController: UIViewController {
         
         createButton.isEnabled = valid
         createButton.backgroundColor = valid
-            ? UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0)
-            : UIColor(red: 174/255, green: 175/255, blue: 180/255, alpha: 1.0)
+            ? UIColor(named: "Black")
+            : UIColor(named: "Gray")
     }
 }
 

@@ -40,15 +40,15 @@ class MainTabBarController: UITabBarController {
         appearance.backgroundColor = .white
 
         // Линия
-        appearance.shadowColor = UIColor(red: 174/255, green: 175/255, blue: 180/255, alpha: 1)
+        appearance.shadowColor = UIColor(named: "Gray")
 
         // Неактивное состояние
-        let unselectedColor = UIColor(red: 174/255, green: 175/255, blue: 180/255, alpha: 1)
+        let unselectedColor = UIColor(named: "Gray")
         appearance.stackedLayoutAppearance.normal.iconColor = unselectedColor
         appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: unselectedColor]
 
         // Активное состояние
-        let selectedColor = UIColor(red: 55/255, green: 114/255, blue: 231/255, alpha: 1)
+        let selectedColor = UIColor(named: "Blue")
         appearance.stackedLayoutAppearance.selected.iconColor = selectedColor
         appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: selectedColor]
 
