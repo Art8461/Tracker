@@ -13,7 +13,7 @@ final class TrackersSectionHeader: UICollectionReusableView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 19, weight: .bold)
-        label.textColor = UIColor(named: "Black")
+        label.textColor = UIColor(named: "AppBlack")
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()

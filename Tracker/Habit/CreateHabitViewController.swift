@@ -28,47 +28,37 @@ final class CreateHabitViewController: UIViewController {
         label.text = "Новая привычка"
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
-        label.textColor = UIColor(named: "Black")
+        label.textColor = UIColor(named: "AppBlack")
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private lazy var nameTextView: UITextView = {
-        let textView = UITextView()
-        textView.font = .systemFont(ofSize: 17)
-        textView.textColor = UIColor(named: "Black")
-        textView.backgroundColor = UIColor(named: "GrayOsn")
-        textView.layer.cornerRadius = 16
-        textView.textContainerInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 45) // Оставляем место справа
-        textView.delegate = self
-        textView.isScrollEnabled = false // Чтобы размер ячейки менялся под текст
-        textView.translatesAutoresizingMaskIntoConstraints = false
-        return textView
-    }()
-    
-    private let placeholderLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Введите название трекера"
-        label.font = .systemFont(ofSize: 17)
-        label.textColor = UIColor(named: "Gray")
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-
-    private lazy var clearTextViewButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "xmark.circle"), for: .normal)
-        button.tintColor = UIColor(named: "Gray")
-        button.addTarget(self, action: #selector(clearTextViewText), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
+    private lazy var nameTextField: UITextField = {
+        let textField = UITextField()
+        textField.font = .systemFont(ofSize: 17)
+        textField.textColor = UIColor(named: "AppBlack")
+        textField.backgroundColor = UIColor(named: "AppGrayOsn")
+        textField.layer.cornerRadius = 16
+        textField.clearButtonMode = .whileEditing
+        textField.returnKeyType = .done
+        textField.placeholder = "Введите название трекера"
+        textField.delegate = self
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.addTarget(self, action: #selector(nameFieldEditingChanged), for: .editingChanged)
+        let leftPadding = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 0))
+        textField.leftView = leftPadding
+        textField.leftViewMode = .always
+        let rightPadding = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 0))
+        textField.rightView = rightPadding
+        textField.rightViewMode = .unlessEditing
+        return textField
     }()
 
     private let emojiTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Emoji"
         label.font = .systemFont(ofSize: 19, weight: .semibold)
-        label.textColor = UIColor(named: "Black")
+        label.textColor = UIColor(named: "AppBlack")
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -93,7 +83,7 @@ final class CreateHabitViewController: UIViewController {
         let label = UILabel()
         label.text = "Цвет"
         label.font = .systemFont(ofSize: 19, weight: .semibold)
-        label.textColor = UIColor(named: "Black")
+        label.textColor = UIColor(named: "AppBlack")
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -120,7 +110,7 @@ final class CreateHabitViewController: UIViewController {
         let label = UILabel()
         label.text = "Ограничение 38 символов"
         label.font = .systemFont(ofSize: 17)
-        label.textColor = UIColor(named: "Red")
+        label.textColor = UIColor(named: "AppRed")
         label.textAlignment = .center
         label.isHidden = true
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -138,7 +128,7 @@ final class CreateHabitViewController: UIViewController {
     private lazy var categoryButton: UIButton = {
         let button = createSelectionButton(title: "Категория", subtitle: nil)
         button.addTarget(self, action: #selector(categoryTapped), for: .touchUpInside)
-        button.backgroundColor = UIColor(named: "GrayOsn")
+        button.backgroundColor = UIColor(named: "AppGrayOsn")
         button.layer.cornerRadius = 16
         button.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         return button
@@ -147,7 +137,7 @@ final class CreateHabitViewController: UIViewController {
     private lazy var scheduleButton: UIButton = {
         let button = createSelectionButton(title: "Расписание", subtitle: nil)
         button.addTarget(self, action: #selector(scheduleTapped), for: .touchUpInside)
-        button.backgroundColor = UIColor(named: "GrayOsn")
+        button.backgroundColor = UIColor(named: "AppGrayOsn")
         button.layer.cornerRadius = 16
         button.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         return button
@@ -155,7 +145,7 @@ final class CreateHabitViewController: UIViewController {
     
     private let separatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(named: "Gray")
+        view.backgroundColor = UIColor(named: "AppGray")
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -168,7 +158,7 @@ final class CreateHabitViewController: UIViewController {
         button.backgroundColor = .white
         button.layer.cornerRadius = 16
         button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.systemRed.cgColor
+        button.layer.borderColor = UIColor(named: "AppRed")?.cgColor ?? UIColor.red.cgColor
         button.addTarget(self, action: #selector(cancelTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -179,7 +169,7 @@ final class CreateHabitViewController: UIViewController {
         button.setTitle("Создать", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor(named: "GrayButton")
+        button.backgroundColor = UIColor(named: "AppGrayButton")
         button.layer.cornerRadius = 16
         button.isEnabled = false
         button.addTarget(self, action: #selector(createTapped), for: .touchUpInside)
@@ -229,7 +219,7 @@ final class CreateHabitViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(named: "White")
+        view.backgroundColor = UIColor(named: "AppWhite")
         configureUI()
         setupKeyboardObservers()
     }
@@ -237,6 +227,11 @@ final class CreateHabitViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateCollectionViewHeights()
     }
     
     
@@ -258,13 +253,8 @@ final class CreateHabitViewController: UIViewController {
         contentView.addSubview(colorTitleLabel)
         contentView.addSubview(colorCollectionView)
         
-        nameContainer.addArrangedSubview(nameTextView)
+        nameContainer.addArrangedSubview(nameTextField)
         nameContainer.addArrangedSubview(characterLimitLabel)
-        
-        nameTextView.addSubview(placeholderLabel)
-        
-        contentView.addSubview(clearTextViewButton)
-        clearTextViewButton.isHidden = true
         
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -284,15 +274,7 @@ final class CreateHabitViewController: UIViewController {
             nameContainer.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
             nameContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             nameContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            nameTextView.heightAnchor.constraint(equalToConstant: 75),
-            
-            placeholderLabel.leadingAnchor.constraint(equalTo: nameTextView.leadingAnchor, constant: nameTextView.textContainerInset.left + 2),
-            placeholderLabel.topAnchor.constraint(equalTo: nameTextView.topAnchor, constant: nameTextView.textContainerInset.top),
-            
-            clearTextViewButton.trailingAnchor.constraint(equalTo: nameTextView.trailingAnchor, constant: -12),
-            clearTextViewButton.centerYAnchor.constraint(equalTo: nameTextView.centerYAnchor),
-            clearTextViewButton.widthAnchor.constraint(equalToConstant: 17),
-            clearTextViewButton.heightAnchor.constraint(equalToConstant: 17),
+            nameTextField.heightAnchor.constraint(equalToConstant: 75),
             
             categoryButton.topAnchor.constraint(equalTo: characterLimitLabel.bottomAnchor, constant: 24),
             categoryButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -388,13 +370,6 @@ final class CreateHabitViewController: UIViewController {
         colorCollectionView.reloadItems(at: toReload)
     }
     
-    func centerTextViewTextVertically(_ textView: UITextView) {
-        let fittingSize = CGSize(width: textView.bounds.width, height: CGFloat.greatestFiniteMagnitude)
-        let size = textView.sizeThatFits(fittingSize)
-        let topOffset = max(0, (textView.bounds.height - size.height * textView.zoomScale) / 2)
-        textView.contentOffset = CGPoint(x: 0, y: -topOffset)
-    }
-    
     
     private func createSelectionButton(title: String, subtitle: String?) -> UIButton {
         let button = UIButton(type: .system)
@@ -410,7 +385,7 @@ final class CreateHabitViewController: UIViewController {
         let mainTitle = UILabel()
         mainTitle.text = title
         mainTitle.font = .systemFont(ofSize: 17)
-        mainTitle.textColor = UIColor(named: "Black")
+        mainTitle.textColor = UIColor(named: "AppBlack")
         
         stackView.addArrangedSubview(mainTitle)
         
@@ -425,7 +400,7 @@ final class CreateHabitViewController: UIViewController {
         button.addSubview(stackView)
         
         let chevron = UIImageView(image: UIImage(named: "Right"))
-        chevron.tintColor = UIColor(named: "Gray")
+        chevron.tintColor = UIColor(named: "AppGray")
         chevron.translatesAutoresizingMaskIntoConstraints = false
         button.addSubview(chevron)
         
@@ -526,16 +501,13 @@ final class CreateHabitViewController: UIViewController {
     
     // MARK: - Actions
     
-    @objc private func textFieldDidChange() {
+    @objc private func nameFieldEditingChanged() {
+        updateNameLimitLabel(for: nameTextField.text ?? "")
         validateForm()
     }
     
-    @objc private func clearTextViewText() {
-        nameTextView.text = ""
-        placeholderLabel.isHidden = false
-        characterLimitLabel.isHidden = true
-        clearTextViewButton.isHidden = true
-        validateForm()
+    private func updateNameLimitLabel(for text: String) {
+        characterLimitLabel.isHidden = text.count <= nameLimit
     }
     
     @objc private func categoryTapped() {
@@ -559,7 +531,7 @@ final class CreateHabitViewController: UIViewController {
     
     @objc private func createTapped() {
         guard
-            let title = nameTextView.text?.trimmingCharacters(in: .whitespacesAndNewlines),
+            let title = nameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
             !title.isEmpty,
             let category = selectedCategory,
             !selectedSchedule.isEmpty,
@@ -578,7 +550,8 @@ final class CreateHabitViewController: UIViewController {
     
     
     private func validateForm() {
-        let nameValid = !(nameTextView.text?.isEmpty ?? true)
+        let trimmedName = nameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let nameValid = !trimmedName.isEmpty
         let categoryValid = selectedCategory != nil
         let scheduleValid = !selectedSchedule.isEmpty
         let emojiValid = selectedEmoji != nil
@@ -588,8 +561,8 @@ final class CreateHabitViewController: UIViewController {
         
         createButton.isEnabled = valid
         createButton.backgroundColor = valid
-            ? UIColor(named: "Black")
-            : UIColor(named: "Gray")
+            ? UIColor(named: "AppBlack")
+            : UIColor(named: "AppGray")
     }
     
     private func dismissCreationFlow() {
@@ -604,38 +577,19 @@ final class CreateHabitViewController: UIViewController {
 
 // MARK: - UITextFieldDelegate
 
-extension CreateHabitViewController: UITextViewDelegate {
-    // Показывать кнопку только если редактируешь И текст не пустой
-    func textViewDidChange(_ textView: UITextView) {
-        placeholderLabel.isHidden = !textView.text.isEmpty
-        clearTextViewButton.isHidden = textView.text.isEmpty || !textView.isFirstResponder
-        centerTextViewTextVertically(textView)
-        validateForm()
+extension CreateHabitViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        centerTextViewTextVertically(nameTextView)
-        updateCollectionViewHeights()
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let current = textField.text ?? ""
+        guard let stringRange = Range(range, in: current) else { return false }
+        let updatedText = current.replacingCharacters(in: stringRange, with: string)
+        updateNameLimitLabel(for: updatedText)
+        return updatedText.count <= nameLimit
     }
-    
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        placeholderLabel.isHidden = !textView.text.isEmpty
-        clearTextViewButton.isHidden = textView.text.isEmpty
-    }
-    
-    func textViewDidEndEditing(_ textView: UITextView) {
-        placeholderLabel.isHidden = !textView.text.isEmpty
-        clearTextViewButton.isHidden = true
-    }
-
-    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-            let current = textView.text ?? ""
-            guard let stringRange = Range(range, in: current) else { return false }
-            let updatedText = current.replacingCharacters(in: stringRange, with: text)
-            characterLimitLabel.isHidden = updatedText.count <= nameLimit
-            return updatedText.count <= nameLimit
-        }
 }
 
 // MARK: - CategorySelectionViewControllerDelegate
@@ -737,7 +691,7 @@ private final class EmojiCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.layer.cornerRadius = 16
-        contentView.backgroundColor = UIColor(named: "White")
+        contentView.backgroundColor = UIColor(named: "AppWhite")
         contentView.addSubview(emojiLabel)
         
         NSLayoutConstraint.activate([
@@ -757,8 +711,8 @@ private final class EmojiCollectionViewCell: UICollectionViewCell {
     
     private func updateSelectionAppearance(isSelected: Bool) {
         contentView.backgroundColor = isSelected
-            ? UIColor(named: "GrayOsn100")
-            : UIColor(named: "White")
+            ? UIColor(named: "AppGrayOsn100")
+            : UIColor(named: "AppWhite")
     }
 }
 
@@ -791,7 +745,7 @@ private final class ColorCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(hex: String, isSelected: Bool) {
-        colorView.backgroundColor = UIColor(hex: hex) ?? UIColor(named: "GrayOsn100")
+        colorView.backgroundColor = UIColor(hex: hex) ?? UIColor(named: "AppGrayOsn100")
         updateSelectionAppearance(isSelected: isSelected)
     }
     

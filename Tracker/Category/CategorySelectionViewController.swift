@@ -29,7 +29,7 @@ final class CategorySelectionViewController: UIViewController {
         didSet { updateDoneButtonState() }
     }
     
-    private let tableBackgroundColor = UIColor(named: "GrayOsn")
+    private let tableBackgroundColor = UIColor(named: "AppGrayOsn")
     
     private lazy var tableView: UITableView = {
         let table = UITableView(frame: .zero, style: .insetGrouped)
@@ -46,7 +46,7 @@ final class CategorySelectionViewController: UIViewController {
         button.setTitle("Готово", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor(named: "Black")
+        button.backgroundColor = UIColor(named: "AppBlack")
         button.layer.cornerRadius = 16
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(doneTapped), for: .touchUpInside)
@@ -82,7 +82,7 @@ final class CategorySelectionViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CategoryCell")
-        tableView.backgroundColor = UIColor(named: "White")
+        tableView.backgroundColor = UIColor(named: "AppWhite")
         view.addSubview(tableView)
         
         NSLayoutConstraint.activate([
@@ -201,7 +201,7 @@ extension CategorySelectionViewController: UITableViewDataSource {
             cell.accessoryType = category == selectedCategory ? .checkmark : .none
         case .addCategory:
             cell.textLabel?.text = "Добавить категорию"
-            cell.textLabel?.textColor = UIColor(named: "Black")
+            cell.textLabel?.textColor = UIColor(named: "AppBlack")
             cell.accessoryType = .disclosureIndicator
         }
         cell.backgroundColor = tableBackgroundColor

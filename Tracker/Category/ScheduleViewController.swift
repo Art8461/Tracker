@@ -20,14 +20,14 @@ final class ScheduleViewController: UIViewController {
     
     private var selectedWeekdays: Set<Weekday>
     
-    private let tableBackgroundColor = UIColor(named: "GrayOsn")
+    private let tableBackgroundColor = UIColor(named: "AppGrayOsn")
     
     private lazy var tableView: UITableView = {
         let table = UITableView(frame: .zero, style: .insetGrouped)
         table.translatesAutoresizingMaskIntoConstraints = false
         table.separatorStyle = .singleLine
         table.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        table.backgroundColor = UIColor(named: "White")
+        table.backgroundColor = UIColor(named: "AppWhite")
         table.tableHeaderView = UIView(frame: .zero)
         table.tableFooterView = UIView(frame: .zero)
         return table
@@ -38,7 +38,7 @@ final class ScheduleViewController: UIViewController {
         button.setTitle("Готово", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor(named: "Black")
+        button.backgroundColor = UIColor(named: "AppBlack")
         button.layer.cornerRadius = 16
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(doneTapped), for: .touchUpInside)
@@ -130,9 +130,9 @@ extension ScheduleViewController: UITableViewDataSource {
         let toggle = UISwitch()
         toggle.isOn = selectedWeekdays.contains(weekday)
         toggle.tag = weekday.rawValue
-        toggle.onTintColor = UIColor(red: 55/255, green: 114/255, blue: 231/255, alpha: 1.0)
+        toggle.onTintColor = UIColor(named: "AppBlue")
         toggle.thumbTintColor = .white
-        toggle.backgroundColor = UIColor(named: "GrayOsn100")
+        toggle.backgroundColor = UIColor(named: "AppGrayOsn100")
         toggle.layer.cornerRadius = 16
         toggle.clipsToBounds = true
         toggle.addTarget(self, action: #selector(switchChanged(_:)), for: .valueChanged)

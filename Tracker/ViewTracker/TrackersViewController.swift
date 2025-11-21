@@ -27,7 +27,7 @@ class TrackersViewController: UIViewController{
                                    style: .plain,
                                    target: self,
                                    action: #selector(addTapped))
-        item.tintColor = UIColor(named: "Black")
+        item.tintColor = UIColor(named: "AppBlack")
         return item
     }()
     
@@ -59,7 +59,7 @@ class TrackersViewController: UIViewController{
         let label = UILabel()
         label.text = "Что будем отслеживать?"
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        label.textColor = UIColor(named: "Black")
+        label.textColor = UIColor(named: "AppBlack")
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label

@@ -40,7 +40,8 @@ final class TrackerCell: UICollectionViewCell {
     private let emojiBackground: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = UIColor(named: "White")
+        let baseColor = UIColor(named: "AppWhite") ?? UIColor.white
+        view.backgroundColor = baseColor.withAlphaComponent(0.3)
         view.layer.cornerRadius = 17
         view.layer.masksToBounds = true
         return view
@@ -56,7 +57,7 @@ final class TrackerCell: UICollectionViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .medium)
-        label.textColor = UIColor(named: "White")
+        label.textColor = UIColor(named: "AppWhite")
         label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -65,7 +66,7 @@ final class TrackerCell: UICollectionViewCell {
     private let daysLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .medium)
-        label.textColor = UIColor(named: "Black")
+        label.textColor = UIColor(named: "AppBlack") ?? UIColor.black
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
