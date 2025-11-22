@@ -71,7 +71,7 @@ class TrackersViewController: UIViewController{
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 12
         layout.minimumInteritemSpacing = 9
-        layout.sectionInset = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        layout.sectionInset = UIEdgeInsets(top: 16, left: 16, bottom: 12, right: 16)
         
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.backgroundColor = .clear
@@ -146,7 +146,7 @@ class TrackersViewController: UIViewController{
                                 withReuseIdentifier: TrackersSectionHeader.reuseIdentifier)
 
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 8),
+            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 24),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -388,7 +388,7 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForHeaderInSection section: Int) -> CGSize {
         guard section < filteredCategories.count else { return .zero }
-        return CGSize(width: collectionView.bounds.width, height: 42)
+        return CGSize(width: collectionView.bounds.width, height: 22)
     }
 }
 

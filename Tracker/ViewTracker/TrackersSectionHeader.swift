@@ -21,11 +21,12 @@ final class TrackersSectionHeader: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubview(titleLabel)
+        titleLabel.setContentHuggingPriority(.required, for: .vertical)
+        
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
-            titleLabel.topAnchor.constraint(equalTo: topAnchor)
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 28),
+            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -6),
+            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
     

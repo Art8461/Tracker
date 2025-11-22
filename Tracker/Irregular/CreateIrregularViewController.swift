@@ -80,7 +80,6 @@ final class CreateIrregularViewController: UIViewController {
         button.addTarget(self, action: #selector(categoryTapped), for: .touchUpInside)
         button.backgroundColor = UIColor(named: "AppGrayOsn")
         button.layer.cornerRadius = 16
-        button.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         return button
     }()
     

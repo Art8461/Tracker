@@ -42,23 +42,23 @@ final class TrackerCell: UICollectionViewCell {
         view.translatesAutoresizingMaskIntoConstraints = false
         let baseColor = UIColor(named: "AppWhite") ?? UIColor.white
         view.backgroundColor = baseColor.withAlphaComponent(0.3)
-        view.layer.cornerRadius = 17
+        view.layer.cornerRadius = 12
         view.layer.masksToBounds = true
         return view
     }()
     
     private let emojiLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 24)
+        label.font = .systemFont(ofSize: 12)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 17, weight: .medium)
+        label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textColor = UIColor(named: "AppWhite")
-        label.numberOfLines = 2
+        label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -138,8 +138,8 @@ final class TrackerCell: UICollectionViewCell {
             
             emojiBackground.topAnchor.constraint(equalTo: colorView.topAnchor, constant: 12),
             emojiBackground.leadingAnchor.constraint(equalTo: colorView.leadingAnchor, constant: 12),
-            emojiBackground.heightAnchor.constraint(equalToConstant: 34),
-            emojiBackground.widthAnchor.constraint(equalToConstant: 34),
+            emojiBackground.heightAnchor.constraint(equalToConstant: 24),
+            emojiBackground.widthAnchor.constraint(equalToConstant: 24),
             
             emojiLabel.centerXAnchor.constraint(equalTo: emojiBackground.centerXAnchor),
             emojiLabel.centerYAnchor.constraint(equalTo: emojiBackground.centerYAnchor),
@@ -148,11 +148,11 @@ final class TrackerCell: UICollectionViewCell {
             titleLabel.trailingAnchor.constraint(equalTo: colorView.trailingAnchor, constant: -12),
             titleLabel.bottomAnchor.constraint(equalTo: colorView.bottomAnchor, constant: -12),
             
-            daysLabel.centerYAnchor.constraint(equalTo: footerView.centerYAnchor),
-            daysLabel.leadingAnchor.constraint(equalTo: footerView.leadingAnchor, constant: 16),
+            daysLabel.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 16),
+            daysLabel.leadingAnchor.constraint(equalTo: footerView.leadingAnchor, constant: 12),
             
-            plusButton.centerYAnchor.constraint(equalTo: footerView.centerYAnchor),
-            plusButton.trailingAnchor.constraint(equalTo: footerView.trailingAnchor, constant: -16)
+            plusButton.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 8),
+            plusButton.trailingAnchor.constraint(equalTo: footerView.trailingAnchor, constant: -12)
         ])
     }
     
