@@ -74,6 +74,7 @@ final class CreateHabitViewController: UIViewController {
         collection.dataSource = self
         collection.showsVerticalScrollIndicator = false
         collection.allowsMultipleSelection = false
+        collection.isScrollEnabled = false
         collection.register(EmojiCollectionViewCell.self,
                             forCellWithReuseIdentifier: EmojiCollectionViewCell.reuseIdentifier)
         return collection
@@ -99,6 +100,7 @@ final class CreateHabitViewController: UIViewController {
         collection.dataSource = self
         collection.showsVerticalScrollIndicator = false
         collection.allowsMultipleSelection = false
+        collection.isScrollEnabled = false
         collection.register(ColorCollectionViewCell.self,
                             forCellWithReuseIdentifier: ColorCollectionViewCell.reuseIdentifier)
         return collection
@@ -208,7 +210,7 @@ final class CreateHabitViewController: UIViewController {
     
     private let nameLimit = 38
     private let gridItemsPerRow = 6
-    private let gridSpacing: CGFloat = 12
+    private let gridSpacing: CGFloat = 0
     
     private var emojiHeightConstraint: NSLayoutConstraint?
     private var colorHeightConstraint: NSLayoutConstraint?
@@ -256,17 +258,20 @@ final class CreateHabitViewController: UIViewController {
         nameContainer.addArrangedSubview(nameTextField)
         nameContainer.addArrangedSubview(characterLimitLabel)
         
+        let contentLayoutGuide = scrollView.contentLayoutGuide
+        let frameLayoutGuide = scrollView.frameLayoutGuide
+        
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: cancelButton.topAnchor, constant: -16),
             
-            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            contentView.topAnchor.constraint(equalTo: contentLayoutGuide.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: contentLayoutGuide.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: contentLayoutGuide.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: contentLayoutGuide.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: frameLayoutGuide.widthAnchor),
             
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 27),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
@@ -326,24 +331,34 @@ final class CreateHabitViewController: UIViewController {
     }
     
     private func updateCollectionViewHeights() {
-        emojiHeightConstraint?.constant = calculatedHeight(for: emojiCollectionView, itemCount: emojiOptions.count)
-        colorHeightConstraint?.constant = calculatedHeight(for: colorCollectionView, itemCount: colorOptions.count)
+        let availableWidth = max(view.bounds.width - 32, 0)
+        emojiHeightConstraint?.constant = calculatedHeight(availableWidth: availableWidth,
+                                                           itemCount: emojiOptions.count)
+        colorHeightConstraint?.constant = calculatedHeight(availableWidth: availableWidth,
+                                                           itemCount: colorOptions.count)
     }
     
-    private func calculatedHeight(for collectionView: UICollectionView, itemCount: Int) -> CGFloat {
+    private func calculatedHeight(availableWidth: CGFloat, itemCount: Int) -> CGFloat {
         guard itemCount > 0 else { return 0 }
+        let itemWidth = itemWidth(forAvailableWidth: availableWidth)
         let rows = Int(ceil(Double(itemCount) / Double(max(gridItemsPerRow, 1))))
-        let itemWidth = calculateItemWidth(for: collectionView)
         let spacing = CGFloat(max(rows - 1, 0)) * gridSpacing
         return CGFloat(rows) * itemWidth + spacing
     }
     
     private func calculateItemWidth(for collectionView: UICollectionView) -> CGFloat {
+        let width = collectionView.bounds.width > 0
+            ? collectionView.bounds.width
+            : max(view.bounds.width - 32, 0)
+        return itemWidth(forAvailableWidth: width)
+    }
+    
+    private func itemWidth(forAvailableWidth availableWidth: CGFloat) -> CGFloat {
         let items = CGFloat(max(gridItemsPerRow, 1))
         let totalSpacing = CGFloat(max(gridItemsPerRow - 1, 0)) * gridSpacing
-        let availableWidth = collectionView.bounds.width - totalSpacing
-        guard availableWidth > 0 else { return 44 }
-        return floor(availableWidth / items)
+        let usableWidth = availableWidth - totalSpacing
+        guard usableWidth > 0 else { return 44 }
+        return floor(usableWidth / items)
     }
     
     private func handleEmojiSelection(at indexPath: IndexPath) {
