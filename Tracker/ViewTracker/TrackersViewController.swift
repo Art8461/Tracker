@@ -41,10 +41,15 @@ class TrackersViewController: UIViewController{
         sb.searchTextField.attributedPlaceholder = NSAttributedString(
             string: "Поиск",
             attributes: [
-                .foregroundColor: UIColor(red: 60/255, green: 60/255, blue: 67/255, alpha: 0.6),
+                .foregroundColor: UIColor(red: 174/255, green: 175/255, blue: 180/255, alpha: 1.0),
                 .font: UIFont.systemFont(ofSize: 17)
             ]
         )
+        
+        if let glassIconView = sb.searchTextField.leftView as? UIImageView {
+            glassIconView.image = glassIconView.image?.withRenderingMode(.alwaysTemplate)
+            glassIconView.tintColor = UIColor(red: 174/255, green: 175/255, blue: 180/255, alpha: 1.0)
+        }
         
         return sb
     }()
