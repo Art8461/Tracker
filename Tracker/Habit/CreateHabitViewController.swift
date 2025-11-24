@@ -57,7 +57,7 @@ final class CreateHabitViewController: UIViewController {
     private let emojiTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Emoji"
-        label.font = .systemFont(ofSize: 19, weight: .semibold)
+        label.font = .systemFont(ofSize: 19, weight: .bold)
         label.textColor = UIColor(named: "AppBlack")
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -83,7 +83,7 @@ final class CreateHabitViewController: UIViewController {
     private let colorTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Цвет"
-        label.font = .systemFont(ofSize: 19, weight: .semibold)
+        label.font = .systemFont(ofSize: 19, weight: .bold)
         label.textColor = UIColor(named: "AppBlack")
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -204,9 +204,9 @@ final class CreateHabitViewController: UIViewController {
                                 "😇", "😡", "🥶", "🤔", "🙌", "🍔",
                                 "🥦", "🏓", "🥇", "🎸", "🏝", "😪"]
     
-    private let colorOptions = ["#FD4C49", "#FF881E", "#007BFA", "#6E44FF", "#34C759", "#20BF6B",
-                                "#FFD426", "#FF6EB6", "#AF52DE", "#8E8E93", "#5856D6", "#34AADC",
-                                "#FF2D55", "#5AC8FA", "#4ECDC4", "#5851DB", "#A2845E", "#C0C0C0"]
+    private let colorOptions = ["#FD4C49", "#FF881E", "#007BFA", "#6E44FF", "#33CF69", "#E66DD4",
+                                "#F9D4D4", "#34A7FE", "#46E69D", "#35347C", "#FF674D", "#FF99CC",
+                                "#F6C48B", "#7994F5", "#832CF1", "#AD56DA", "#A2845E", "#2FD058"]
     
     private let nameLimit = 38
     private let gridItemsPerRow = 6
@@ -258,20 +258,17 @@ final class CreateHabitViewController: UIViewController {
         nameContainer.addArrangedSubview(nameTextField)
         nameContainer.addArrangedSubview(characterLimitLabel)
         
-        let contentLayoutGuide = scrollView.contentLayoutGuide
-        let frameLayoutGuide = scrollView.frameLayoutGuide
-        
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: cancelButton.topAnchor, constant: -16),
             
-            contentView.topAnchor.constraint(equalTo: contentLayoutGuide.topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: contentLayoutGuide.leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: contentLayoutGuide.trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: contentLayoutGuide.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: frameLayoutGuide.widthAnchor),
+            contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
             
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 27),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
@@ -297,20 +294,20 @@ final class CreateHabitViewController: UIViewController {
             scheduleButton.heightAnchor.constraint(equalToConstant: 75),
             
             emojiTitleLabel.topAnchor.constraint(equalTo: scheduleButton.bottomAnchor, constant: 32),
-            emojiTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            emojiTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
             emojiTitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
             emojiCollectionView.topAnchor.constraint(equalTo: emojiTitleLabel.bottomAnchor, constant: 16),
-            emojiCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            emojiCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            emojiCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 18),
+            emojiCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -19),
             
-            colorTitleLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 32),
-            colorTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            colorTitleLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
+            colorTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
             colorTitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
             colorCollectionView.topAnchor.constraint(equalTo: colorTitleLabel.bottomAnchor, constant: 16),
-            colorCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            colorCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            colorCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 18),
+            colorCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -19),
             colorCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -32),
             
             cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -408,7 +405,7 @@ final class CreateHabitViewController: UIViewController {
             let s = UILabel()
             s.text = subtitle
             s.font = .systemFont(ofSize: 17)
-            s.textColor = .systemGray
+            s.textColor = UIColor(named: "AppGray")
             stackView.addArrangedSubview(s)
         }
         
@@ -692,12 +689,14 @@ extension CreateHabitViewController: UICollectionViewDataSource, UICollectionVie
 
 // MARK: - Collection View Cells
 
+// MARK: EmojiCollection
+
 private final class EmojiCollectionViewCell: UICollectionViewCell {
     static let reuseIdentifier = "EmojiCollectionViewCell"
     
     private let emojiLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 30)
+        label.font = .systemFont(ofSize: 32)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -731,6 +730,9 @@ private final class EmojiCollectionViewCell: UICollectionViewCell {
     }
 }
 
+// MARK: СolorCollection
+
+
 private final class ColorCollectionViewCell: UICollectionViewCell {
     static let reuseIdentifier = "ColorCollectionViewCell"
     
@@ -742,16 +744,22 @@ private final class ColorCollectionViewCell: UICollectionViewCell {
         return view
     }()
     
+private let innerInset: CGFloat = 6
+private var currentColor: UIColor?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.backgroundColor = .clear
+        contentView.layer.cornerRadius = 8
+        contentView.layer.masksToBounds = true
+        
         contentView.addSubview(colorView)
         
         NSLayoutConstraint.activate([
-            colorView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            colorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            colorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            colorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            colorView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: innerInset),
+            colorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: innerInset),
+            colorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -innerInset),
+            colorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -innerInset)
         ])
     }
     
@@ -760,12 +768,22 @@ private final class ColorCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(hex: String, isSelected: Bool) {
-        colorView.backgroundColor = UIColor(hex: hex) ?? UIColor(named: "AppGrayOsn100")
+        let color = UIColor(hex: hex) ?? UIColor(named: "AppGrayOsn100")
+        currentColor = color
+        colorView.backgroundColor = color
         updateSelectionAppearance(isSelected: isSelected)
     }
     
     private func updateSelectionAppearance(isSelected: Bool) {
-        colorView.layer.borderWidth = isSelected ? 2 : 0
-        colorView.layer.borderColor = UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1.0).cgColor
+        guard let color = currentColor else {
+            contentView.backgroundColor = .clear
+            contentView.layer.borderWidth = 0
+            contentView.layer.borderColor = nil
+            return
+        }
+        
+        contentView.backgroundColor = isSelected ? color.withAlphaComponent(0.0) : .clear
+        contentView.layer.borderWidth = isSelected ? 3 : 0
+        contentView.layer.borderColor = isSelected ? color.withAlphaComponent(0.3).cgColor : nil
     }
 }
