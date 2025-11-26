@@ -8,6 +8,37 @@
 import Foundation
 import CoreData
 
+// MARK: - DataBase Store
+
+final class DataBaseStore {
+    static let shared = DataBaseStore()
+    
+    lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "Library")
+        container.loadPersistentStores { _, error in
+            if let error = error as NSError? {
+                assertionFailure("Unresolved error \(error), \(error.userInfo)")
+            }
+        }
+        container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        container.viewContext.automaticallyMergesChangesFromParent = true
+        return container
+    }()
+    
+    private init() {}
+    
+    func saveContextIfNeeded() {
+        let context = persistentContainer.viewContext
+        guard context.hasChanges else { return }
+        do {
+            try context.save()
+        } catch {
+            let nsError = error as NSError
+            assertionFailure("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+    }
+}
+
 // MARK: - Container Provider
 
 
@@ -17,10 +48,7 @@ protocol PersistentContainerProviding {
 
 struct AppDelegateContainerProvider: PersistentContainerProviding {
     var persistentContainer: NSPersistentContainer {
-        guard let delegate = AppDelegate.shared else {
-            fatalError("AppDelegate is not configured yet")
-        }
-        return delegate.persistentContainer
+        return DataBaseStore.shared.persistentContainer
     }
 }
 

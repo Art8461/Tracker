@@ -1,43 +1,42 @@
 //
-//  CreateIrregularViewController.swift
+//  BaseTrackerCreationViewController.swift
 //  Tracker
 //
-//  Created by Artem Kuzmenko on 19.11.2025.
+//  Created by Artem Kuzmenko on 16.11.2025.
 //
 
 import UIKit
 
-final class CreateIrregularViewController: UIViewController {
+class BaseTrackerCreationViewController: UIViewController {
     
     // MARK: - UI Elements
     
-    private let scrollView: UIScrollView = {
+    let scrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.translatesAutoresizingMaskIntoConstraints = false
         return scroll
     }()
     
-    private let contentView: UIView = {
+    let contentView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    private let titleLabel: UILabel = {
+    let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новая привычка"
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
-        label.textColor = UIColor(named: "AppBlack")
+        label.textColor = UIColor(resource: .appBlack)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private lazy var nameTextField: UITextField = {
+    lazy var nameTextField: UITextField = {
         let textField = UITextField()
         textField.font = .systemFont(ofSize: 17)
-        textField.textColor = UIColor(named: "AppBlack")
-        textField.backgroundColor = UIColor(named: "AppGrayOsn")
+        textField.textColor = UIColor(resource: .appBlack)
+        textField.backgroundColor = UIColor(resource: .appGrayOsn)
         textField.layer.cornerRadius = 16
         textField.clearButtonMode = .whileEditing
         textField.returnKeyType = .done
@@ -53,17 +52,17 @@ final class CreateIrregularViewController: UIViewController {
         textField.rightViewMode = .unlessEditing
         return textField
     }()
-
-    private let emojiTitleLabel: UILabel = {
+    
+    let emojiTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Emoji"
         label.font = .systemFont(ofSize: 19, weight: .bold)
-        label.textColor = UIColor(named: "AppBlack")
+        label.textColor = UIColor(resource: .appBlack)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-
-    private lazy var emojiCollectionView: UICollectionView = {
+    
+    lazy var emojiCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = gridSpacing
         layout.minimumInteritemSpacing = gridSpacing
@@ -79,17 +78,17 @@ final class CreateIrregularViewController: UIViewController {
                             forCellWithReuseIdentifier: EmojiCollectionViewCell.reuseIdentifier)
         return collection
     }()
-
-    private let colorTitleLabel: UILabel = {
+    
+    let colorTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Цвет"
         label.font = .systemFont(ofSize: 19, weight: .bold)
-        label.textColor = UIColor(named: "AppBlack")
+        label.textColor = UIColor(resource: .appBlack)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-
-    private lazy var colorCollectionView: UICollectionView = {
+    
+    lazy var colorCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = gridSpacing
         layout.minimumInteritemSpacing = gridSpacing
@@ -105,20 +104,19 @@ final class CreateIrregularViewController: UIViewController {
                             forCellWithReuseIdentifier: ColorCollectionViewCell.reuseIdentifier)
         return collection
     }()
-
     
-    private let characterLimitLabel: UILabel = {
+    let characterLimitLabel: UILabel = {
         let label = UILabel()
         label.text = "Ограничение 38 символов"
         label.font = .systemFont(ofSize: 17)
-        label.textColor = UIColor(named: "AppRed")
+        label.textColor = UIColor(resource: .appRed)
         label.textAlignment = .center
         label.isHidden = true
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let nameContainer: UIStackView = {
+    let nameContainer: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
         stack.spacing = 8
@@ -126,15 +124,15 @@ final class CreateIrregularViewController: UIViewController {
         return stack
     }()
     
-    private lazy var categoryButton: UIButton = {
+    lazy var categoryButton: UIButton = {
         let button = createSelectionButton(title: "Категория", subtitle: nil)
         button.addTarget(self, action: #selector(categoryTapped), for: .touchUpInside)
-        button.backgroundColor = UIColor(named: "AppGrayOsn")
+        button.backgroundColor = UIColor(resource: .appGrayOsn)
         button.layer.cornerRadius = 16
         return button
     }()
     
-    private lazy var cancelButton: UIButton = {
+    lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Отменить", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
@@ -142,18 +140,18 @@ final class CreateIrregularViewController: UIViewController {
         button.backgroundColor = .white
         button.layer.cornerRadius = 16
         button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor(named: "AppRed")?.cgColor ?? UIColor.red.cgColor
+        button.layer.borderColor = UIColor(resource: .appRed).cgColor
         button.addTarget(self, action: #selector(cancelTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    private lazy var createButton: UIButton = {
+    lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Создать", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor (named : "AppGrayButton")
+        button.backgroundColor = UIColor(resource: .appGrayButton)
         button.layer.cornerRadius = 16
         button.isEnabled = false
         button.addTarget(self, action: #selector(createTapped), for: .touchUpInside)
@@ -166,39 +164,32 @@ final class CreateIrregularViewController: UIViewController {
     weak var creationDelegate: TrackerCreationDelegate?
     var availableCategories: [String] = []
     
-    private var selectedCategory: String? {
+    var selectedCategory: String? {
         didSet { updateCategorySubtitle() }
     }
     
-    private var selectedEmoji: String? {
+    var selectedEmoji: String? {
         didSet { validateForm() }
     }
     
-    private var selectedColorHex: String? {
+    var selectedColorHex: String? {
         didSet { validateForm() }
     }
     
-    private let emojiOptions = ["🙂", "😻", "🌺", "🐶", "❤️", "😱",
-                                "😇", "😡", "🥶", "🤔", "🙌", "🍔",
-                                "🥦", "🏓", "🥇", "🎸", "🏝", "😪"]
-    private let colorOptions = ["#FD4C49", "#FF881E", "#007BFA", "#6E44FF", "#33CF69", "#E66DD4",
-                                "#F9D4D4", "#34A7FE", "#46E69D", "#35347C", "#FF674D", "#FF99CC",
-                                "#F6C48B", "#7994F5", "#832CF1", "#AD56DA", "#A2845E", "#2FD058"]
+    let nameLimit = 38
+    let gridItemsPerRow = 6
+    let gridSpacing: CGFloat = 0
     
-    private let nameLimit = 38
-    private let gridItemsPerRow = 6
-    private let gridSpacing: CGFloat = 0
-    
-    private var emojiHeightConstraint: NSLayoutConstraint?
-    private var colorHeightConstraint: NSLayoutConstraint?
-    private var selectedEmojiIndexPath: IndexPath?
-    private var selectedColorIndexPath: IndexPath?
+    var emojiHeightConstraint: NSLayoutConstraint?
+    var colorHeightConstraint: NSLayoutConstraint?
+    var selectedEmojiIndexPath: IndexPath?
+    var selectedColorIndexPath: IndexPath?
     
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(resource: .appWhite)
         configureUI()
         setupKeyboardObservers()
     }
@@ -213,10 +204,36 @@ final class CreateIrregularViewController: UIViewController {
         updateCollectionViewHeights()
     }
     
+    // MARK: - Abstract Methods
+    
+    /// Метод для получения расписания (переопределяется в подклассах)
+    func getSchedule() -> [Weekday] {
+        return []
+    }
+    
+    /// Метод для проверки валидности расписания (переопределяется в подклассах)
+    func isScheduleValid() -> Bool {
+        return true
+    }
+    
+    /// Метод для настройки UI элементов, специфичных для подкласса
+    func setupSpecificUI() {
+        // Переопределяется в подклассах
+    }
+    
+    /// Метод для получения элемента, который должен быть выше emojiTitleLabel
+    func getElementAboveEmojiTitle() -> UIView {
+        return categoryButton
+    }
+    
+    /// Метод для получения отступа сверху для emojiTitleLabel
+    func getEmojiTitleTopSpacing() -> CGFloat {
+        return 32
+    }
     
     // MARK: - UI Setup
     
-    private func configureUI() {
+    func configureUI() {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         view.addSubview(cancelButton)
@@ -232,6 +249,10 @@ final class CreateIrregularViewController: UIViewController {
         
         nameContainer.addArrangedSubview(nameTextField)
         nameContainer.addArrangedSubview(characterLimitLabel)
+        
+        setupSpecificUI()
+        
+        let elementAboveEmoji = getElementAboveEmojiTitle()
         
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -258,7 +279,7 @@ final class CreateIrregularViewController: UIViewController {
             categoryButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             categoryButton.heightAnchor.constraint(equalToConstant: 75),
             
-            emojiTitleLabel.topAnchor.constraint(equalTo: categoryButton.bottomAnchor, constant: 32),
+            emojiTitleLabel.topAnchor.constraint(equalTo: elementAboveEmoji.bottomAnchor, constant: getEmojiTitleTopSpacing()),
             emojiTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
             emojiTitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
@@ -292,7 +313,62 @@ final class CreateIrregularViewController: UIViewController {
         colorHeightConstraint?.isActive = true
     }
     
-    private func createSelectionButton(title: String, subtitle: String?) -> UIButton {
+    func updateCollectionViewHeights() {
+        let availableWidth = max(view.bounds.width - 32, 0)
+        emojiHeightConstraint?.constant = calculatedHeight(availableWidth: availableWidth,
+                                                           itemCount: MockData.emojis.count)
+        colorHeightConstraint?.constant = calculatedHeight(availableWidth: availableWidth,
+                                                           itemCount: MockData.colors.count)
+    }
+    
+    func calculatedHeight(availableWidth: CGFloat, itemCount: Int) -> CGFloat {
+        guard itemCount > 0 else { return 0 }
+        let itemWidth = itemWidth(forAvailableWidth: availableWidth)
+        let rows = Int(ceil(Double(itemCount) / Double(max(gridItemsPerRow, 1))))
+        let spacing = CGFloat(max(rows - 1, 0)) * gridSpacing
+        return CGFloat(rows) * itemWidth + spacing
+    }
+    
+    func calculateItemWidth(for collectionView: UICollectionView) -> CGFloat {
+        let width = collectionView.bounds.width > 0
+            ? collectionView.bounds.width
+            : max(view.bounds.width - 32, 0)
+        return itemWidth(forAvailableWidth: width)
+    }
+    
+    func itemWidth(forAvailableWidth availableWidth: CGFloat) -> CGFloat {
+        let items = CGFloat(max(gridItemsPerRow, 1))
+        let totalSpacing = CGFloat(max(gridItemsPerRow - 1, 0)) * gridSpacing
+        let usableWidth = availableWidth - totalSpacing
+        guard usableWidth > 0 else { return 44 }
+        return floor(usableWidth / items)
+    }
+    
+    func handleEmojiSelection(at indexPath: IndexPath) {
+        if selectedEmojiIndexPath == indexPath { return }
+        let previous = selectedEmojiIndexPath
+        selectedEmojiIndexPath = indexPath
+        selectedEmoji = MockData.emojis[indexPath.item]
+        var toReload = [indexPath]
+        if let previous = previous {
+            toReload.append(previous)
+        }
+        emojiCollectionView.reloadItems(at: toReload)
+    }
+    
+    func handleColorSelection(at indexPath: IndexPath) {
+        if selectedColorIndexPath == indexPath { return }
+        let previous = selectedColorIndexPath
+        selectedColorIndexPath = indexPath
+        selectedColorHex = MockData.colors[indexPath.item]
+        var toReload = [indexPath]
+        if let previous = previous {
+            toReload.append(previous)
+        }
+        colorCollectionView.reloadItems(at: toReload)
+    }
+    
+    func createSelectionButton(title: String, subtitle: String?) -> UIButton {
         let button = UIButton(type: .system)
         button.contentHorizontalAlignment = .left
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -306,7 +382,7 @@ final class CreateIrregularViewController: UIViewController {
         let mainTitle = UILabel()
         mainTitle.text = title
         mainTitle.font = .systemFont(ofSize: 17)
-        mainTitle.textColor = UIColor(named: "AppBlack")
+        mainTitle.textColor = UIColor(resource: .appBlack)
         
         stackView.addArrangedSubview(mainTitle)
         
@@ -314,14 +390,14 @@ final class CreateIrregularViewController: UIViewController {
             let s = UILabel()
             s.text = subtitle
             s.font = .systemFont(ofSize: 17)
-            s.textColor = .systemGray
+            s.textColor = UIColor(resource: .appGray)
             stackView.addArrangedSubview(s)
         }
         
         button.addSubview(stackView)
         
-        let chevron = UIImageView(image: UIImage(named: "Right"))
-        chevron.tintColor = UIColor(named: "AppGray")
+        let chevron = UIImageView(image: UIImage(resource: .right))
+        chevron.tintColor = UIColor(resource: .appGray)
         chevron.translatesAutoresizingMaskIntoConstraints = false
         button.addSubview(chevron)
         
@@ -339,69 +415,13 @@ final class CreateIrregularViewController: UIViewController {
         return button
     }
     
-    private func updateCollectionViewHeights() {
-        let availableWidth = max(view.bounds.width - 32, 0)
-        emojiHeightConstraint?.constant = calculatedHeight(availableWidth: availableWidth,
-                                                           itemCount: emojiOptions.count)
-        colorHeightConstraint?.constant = calculatedHeight(availableWidth: availableWidth,
-                                                           itemCount: colorOptions.count)
-    }
-    
-    private func calculatedHeight(availableWidth: CGFloat, itemCount: Int) -> CGFloat {
-        guard itemCount > 0 else { return 0 }
-        let itemWidth = itemWidth(forAvailableWidth: availableWidth)
-        let rows = Int(ceil(Double(itemCount) / Double(max(gridItemsPerRow, 1))))
-        let spacing = CGFloat(max(rows - 1, 0)) * gridSpacing
-        return CGFloat(rows) * itemWidth + spacing
-    }
-    
-    private func calculateItemWidth(for collectionView: UICollectionView) -> CGFloat {
-        let width = collectionView.bounds.width > 0
-            ? collectionView.bounds.width
-            : max(view.bounds.width - 32, 0)
-        return itemWidth(forAvailableWidth: width)
-    }
-    
-    private func itemWidth(forAvailableWidth availableWidth: CGFloat) -> CGFloat {
-        let items = CGFloat(max(gridItemsPerRow, 1))
-        let totalSpacing = CGFloat(max(gridItemsPerRow - 1, 0)) * gridSpacing
-        let usableWidth = availableWidth - totalSpacing
-        guard usableWidth > 0 else { return 44 }
-        return floor(usableWidth / items)
-    }
-    
-    private func handleEmojiSelection(at indexPath: IndexPath) {
-        if selectedEmojiIndexPath == indexPath { return }
-        let previous = selectedEmojiIndexPath
-        selectedEmojiIndexPath = indexPath
-        selectedEmoji = emojiOptions[indexPath.item]
-        var toReload = [indexPath]
-        if let previous = previous {
-            toReload.append(previous)
-        }
-        emojiCollectionView.reloadItems(at: toReload)
-    }
-    
-    private func handleColorSelection(at indexPath: IndexPath) {
-        if selectedColorIndexPath == indexPath { return }
-        let previous = selectedColorIndexPath
-        selectedColorIndexPath = indexPath
-        selectedColorHex = colorOptions[indexPath.item]
-        var toReload = [indexPath]
-        if let previous = previous {
-            toReload.append(previous)
-        }
-        colorCollectionView.reloadItems(at: toReload)
-    }
-    
-    
     // MARK: - Subtitle updates
     
-    private func updateCategorySubtitle() {
+    func updateCategorySubtitle() {
         updateButton(categoryButton, subtitle: selectedCategory)
     }
     
-    private func updateButton(_ button: UIButton, subtitle: String?) {
+    func updateButton(_ button: UIButton, subtitle: String?) {
         guard let stack = button.subviews.first(where: { $0 is UIStackView }) as? UIStackView else { return }
         
         // Оставляем первый label (title), остальные убираем
@@ -420,10 +440,9 @@ final class CreateIrregularViewController: UIViewController {
         validateForm()
     }
     
-    
     // MARK: - Keyboard
     
-    private func setupKeyboardObservers() {
+    func setupKeyboardObservers() {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(keyboardWillShow),
@@ -443,34 +462,33 @@ final class CreateIrregularViewController: UIViewController {
         view.addGestureRecognizer(tap)
     }
     
-    @objc private func keyboardWillShow(notification: NSNotification) {
+    @objc func keyboardWillShow(notification: NSNotification) {
         guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
         scrollView.contentInset.bottom = frame.height
         scrollView.verticalScrollIndicatorInsets.bottom = frame.height
     }
     
-    @objc private func keyboardWillHide(notification: NSNotification) {
+    @objc func keyboardWillHide(notification: NSNotification) {
         scrollView.contentInset.bottom = 0
         scrollView.verticalScrollIndicatorInsets.bottom = 0
     }
     
-    @objc private func dismissKeyboard() {
+    @objc func dismissKeyboard() {
         view.endEditing(true)
     }
     
-    
     // MARK: - Actions
     
-    @objc private func nameFieldEditingChanged() {
+    @objc func nameFieldEditingChanged() {
         updateNameLimitLabel(for: nameTextField.text ?? "")
         validateForm()
     }
     
-    private func updateNameLimitLabel(for text: String) {
+    func updateNameLimitLabel(for text: String) {
         characterLimitLabel.isHidden = text.count <= nameLimit
     }
     
-    @objc private func categoryTapped() {
+    @objc func categoryTapped() {
         let controller = CategorySelectionViewController(categories: availableCategories,
                                                          selectedCategory: selectedCategory)
         controller.delegate = self
@@ -478,11 +496,11 @@ final class CreateIrregularViewController: UIViewController {
         present(nav, animated: true)
     }
     
-    @objc private func cancelTapped() {
-        dismiss(animated: true)
+    @objc func cancelTapped() {
+        dismissCreationFlow()
     }
     
-    @objc private func createTapped() {
+    @objc func createTapped() {
         guard
             let title = nameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
             !title.isEmpty,
@@ -495,32 +513,39 @@ final class CreateIrregularViewController: UIViewController {
                               title: title,
                               colorHex: colorHex,
                               emoji: emoji,
-                              schedule: [])
+                              schedule: getSchedule())
         creationDelegate?.trackerCreationDidCreate(tracker, in: category)
-        dismiss(animated: true)
+        dismissCreationFlow()
     }
     
-    
-    private func validateForm() {
+    func validateForm() {
         let trimmedName = nameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         let nameValid = !trimmedName.isEmpty
         let categoryValid = selectedCategory != nil
+        let scheduleValid = isScheduleValid()
         let emojiValid = selectedEmoji != nil
         let colorValid = selectedColorHex != nil
         
-        let valid = nameValid && categoryValid && emojiValid && colorValid
+        let valid = nameValid && categoryValid && scheduleValid && emojiValid && colorValid
         
         createButton.isEnabled = valid
         createButton.backgroundColor = valid
-            ? UIColor(named: "AppBlack")
-            : UIColor(named: "AppGray")
+            ? UIColor(resource: .appBlack)
+            : UIColor(resource: .appGray)
+    }
+    
+    func dismissCreationFlow() {
+        if let nav = navigationController {
+            nav.dismiss(animated: true)
+        } else {
+            dismiss(animated: true)
+        }
     }
 }
 
-
 // MARK: - UITextFieldDelegate
 
-extension CreateIrregularViewController: UITextFieldDelegate {
+extension BaseTrackerCreationViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
@@ -537,7 +562,7 @@ extension CreateIrregularViewController: UITextFieldDelegate {
 
 // MARK: - CategorySelectionViewControllerDelegate
 
-extension CreateIrregularViewController: CategorySelectionViewControllerDelegate {
+extension BaseTrackerCreationViewController: CategorySelectionViewControllerDelegate {
     func categorySelection(_ viewController: CategorySelectionViewController,
                            didSelect category: String,
                            categories: [String]) {
@@ -548,12 +573,12 @@ extension CreateIrregularViewController: CategorySelectionViewControllerDelegate
 
 // MARK: - UICollectionViewDataSource & Delegate
 
-extension CreateIrregularViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension BaseTrackerCreationViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == emojiCollectionView {
-            return emojiOptions.count
+            return MockData.emojis.count
         }
-        return colorOptions.count
+        return MockData.colors.count
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -565,7 +590,7 @@ extension CreateIrregularViewController: UICollectionViewDataSource, UICollectio
             ) as? EmojiCollectionViewCell else {
                 return UICollectionViewCell()
             }
-            let emoji = emojiOptions[indexPath.item]
+            let emoji = MockData.emojis[indexPath.item]
             cell.configure(with: emoji, isSelected: indexPath == selectedEmojiIndexPath)
             return cell
         }
@@ -576,7 +601,7 @@ extension CreateIrregularViewController: UICollectionViewDataSource, UICollectio
         ) as? ColorCollectionViewCell else {
             return UICollectionViewCell()
         }
-        let hex = colorOptions[indexPath.item]
+        let hex = MockData.colors[indexPath.item]
         cell.configure(hex: hex, isSelected: indexPath == selectedColorIndexPath)
         return cell
     }
@@ -611,8 +636,6 @@ extension CreateIrregularViewController: UICollectionViewDataSource, UICollectio
 
 // MARK: - Collection View Cells
 
-// MARK: EmojiCollection
-
 private final class EmojiCollectionViewCell: UICollectionViewCell {
     static let reuseIdentifier = "EmojiCollectionViewCell"
     
@@ -627,7 +650,7 @@ private final class EmojiCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.layer.cornerRadius = 16
-        contentView.backgroundColor = UIColor(named: "AppWhite")
+        contentView.backgroundColor = UIColor(resource: .appWhite)
         contentView.addSubview(emojiLabel)
         
         NSLayoutConstraint.activate([
@@ -637,7 +660,8 @@ private final class EmojiCollectionViewCell: UICollectionViewCell {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        assertionFailure("init(coder:) has not been implemented")
+        return nil
     }
     
     func configure(with emoji: String, isSelected: Bool) {
@@ -647,12 +671,10 @@ private final class EmojiCollectionViewCell: UICollectionViewCell {
     
     private func updateSelectionAppearance(isSelected: Bool) {
         contentView.backgroundColor = isSelected
-            ? UIColor(named: "AppGrayOsn100")
-            : UIColor(named: "AppWhite")
+            ? UIColor(resource: .appGrayOsn100)
+            : UIColor(resource: .appWhite)
     }
 }
-
-// MARK: ColorCollection
 
 private final class ColorCollectionViewCell: UICollectionViewCell {
     static let reuseIdentifier = "ColorCollectionViewCell"
@@ -685,11 +707,12 @@ private final class ColorCollectionViewCell: UICollectionViewCell {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        assertionFailure("init(coder:) has not been implemented")
+        return nil
     }
     
     func configure(hex: String, isSelected: Bool) {
-        let color = UIColor(hex: hex) ?? UIColor(named: "AppGrayOsn100")
+        let color = UIColor(hex: hex) ?? UIColor(resource: .appGrayOsn100)
         currentColor = color
         colorView.backgroundColor = color
         updateSelectionAppearance(isSelected: isSelected)
@@ -708,3 +731,4 @@ private final class ColorCollectionViewCell: UICollectionViewCell {
         contentView.layer.borderColor = isSelected ? color.withAlphaComponent(0.3).cgColor : nil
     }
 }
+

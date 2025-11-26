@@ -36,8 +36,8 @@ final class NewCategoryViewController: UIViewController {
     private lazy var nameTextField: UITextField = {
         let textField = UITextField()
         textField.font = .systemFont(ofSize: 17)
-        textField.textColor = UIColor(named: "AppBlack")
-        textField.backgroundColor = UIColor(named: "AppGrayOsn")
+        textField.textColor = UIColor(resource: .appBlack)
+        textField.backgroundColor = UIColor(resource: .appGrayOsn)
         textField.layer.cornerRadius = 16
         textField.placeholder = "Введите название категории"
         textField.delegate = self
@@ -54,7 +54,7 @@ final class NewCategoryViewController: UIViewController {
         button.setTitle("Готово", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor(named: "AppGrayButton")
+        button.backgroundColor = UIColor(resource: .appGrayButton)
         button.layer.cornerRadius = 16
         button.isEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -183,8 +183,8 @@ final class NewCategoryViewController: UIViewController {
         
         doneButton.isEnabled = isValid
         doneButton.backgroundColor = isValid
-            ? UIColor(named: "AppBlack")
-            : UIColor(named: "AppGrayButton")
+        ? UIColor(resource: .appBlack)
+                  : UIColor(resource: .appGrayButton)
     }
 }
 

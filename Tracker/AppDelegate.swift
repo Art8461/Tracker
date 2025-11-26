@@ -6,13 +6,15 @@
 //
 
 import UIKit
-import CoreData
 
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
     
     static private(set) var shared: AppDelegate?
-
+    
+    private override init() {
+        super.init()
+    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         AppDelegate.shared = self
@@ -28,34 +30,11 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationDidEnterBackground(_ application: UIApplication) {
-        saveContextIfNeeded()
+        DataBaseStore.shared.saveContextIfNeeded()
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
-        saveContextIfNeeded()
-    }
-
-    lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "Library")
-        container.loadPersistentStores { _, error in
-            if let error = error as NSError? {
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        }
-        container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-        container.viewContext.automaticallyMergesChangesFromParent = true
-        return container
-    }()
-    
-    private func saveContextIfNeeded() {
-        let context = persistentContainer.viewContext
-        guard context.hasChanges else { return }
-        do {
-            try context.save()
-        } catch {
-            let nsError = error as NSError
-            assertionFailure("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
+        DataBaseStore.shared.saveContextIfNeeded()
     }
 }
 

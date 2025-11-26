@@ -22,7 +22,7 @@ final class CategorySelectionViewController: UIViewController {
     private var categories: [String]
     private var selectedCategory: String?
     
-    private let tableBackgroundColor = UIColor(named: "AppGrayOsn")
+    private let tableBackgroundColor = UIColor(resource: .appGrayOsn)
     
     private lazy var tableView: UITableView = {
         let table = UITableView(frame: .zero, style: .insetGrouped)
@@ -39,7 +39,7 @@ final class CategorySelectionViewController: UIViewController {
         button.setTitle("Добавить категорию", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor(named: "AppBlack")
+        button.backgroundColor = UIColor(resource: .appBlack)
         button.layer.cornerRadius = 16
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(doneTapped), for: .touchUpInside)
@@ -54,7 +54,7 @@ final class CategorySelectionViewController: UIViewController {
     }()
     
     private let emptyStateImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "Star"))
+        let imageView = UIImageView(image: UIImage(resource: .star))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
         return imageView
@@ -64,7 +64,7 @@ final class CategorySelectionViewController: UIViewController {
         let label = UILabel()
         label.text = "Привычки и события можно\nобъединить по смыслу"
         label.font = .systemFont(ofSize: 12, weight: .medium)
-        label.textColor = UIColor(named: "AppBlack")
+        label.textColor = UIColor(resource: .appBlack)
         label.textAlignment = .center
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -80,7 +80,8 @@ final class CategorySelectionViewController: UIViewController {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        assertionFailure("init(coder:) has not been implemented")
+        return nil
     }
     
     // MARK: - Lifecycle
@@ -124,7 +125,7 @@ final class CategorySelectionViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CategoryCell")
-        tableView.backgroundColor = UIColor(named: "AppWhite")
+        tableView.backgroundColor = UIColor(resource: .appWhite)
         view.addSubview(tableView)
         
         NSLayoutConstraint.activate([
@@ -156,7 +157,7 @@ final class CategorySelectionViewController: UIViewController {
         doneButton.setTitle("Добавить категорию", for: .normal)
         doneButton.isEnabled = true
         doneButton.alpha = 1.0
-        doneButton.backgroundColor = UIColor(named: "AppBlack")
+        doneButton.backgroundColor = UIColor(resource: .appBlack)
     }
     
     // MARK: - Actions
@@ -215,7 +216,7 @@ extension CategorySelectionViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categories.count
+        categories.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
