@@ -42,6 +42,62 @@
 			<key>type</key>
 			<string>bookmark</string>
 		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>Timestamp</key>
+					<string>785743349.0615991</string>
+					<key>XcodeLocation</key>
+					<string>{"Selection":"[{\"key\":\"entities\",\"name\":\"TrackerScheduleItemEntity\",\"className\":\"CDMModel\"},{\"key\":\"attributes\",\"name\":\"weekday\",\"className\":\"CDMEntity\"}]"}</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Library.xcdatamodeld/Library.xcdatamodel</string>
+					</dict>
+				</dict>
+				<key>type</key>
+				<string>IDEDMDocumentLocation</string>
+			</dict>
+			<key>title</key>
+			<string>Warning: TrackerScheduleItemEntity.weekday has default value smaller than minimum value</string>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>Timestamp</key>
+					<string>785743349.0615991</string>
+					<key>XcodeLocation</key>
+					<string>{"Selection":"[{\"key\":\"entities\",\"name\":\"TrackerScheduleItemEntity\",\"className\":\"CDMModel\"},{\"key\":\"attributes\",\"name\":\"weekday\",\"className\":\"CDMEntity\"}]"}</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Library.xcdatamodeld/Library.xcdatamodel</string>
+					</dict>
+				</dict>
+				<key>type</key>
+				<string>IDEDMDocumentLocation</string>
+			</dict>
+			<key>title</key>
+			<string>Warning: TrackerScheduleItemEntity.weekday has default value smaller than minimum value</string>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
 	</array>
 </dict>
 </plist>

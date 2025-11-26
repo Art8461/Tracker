@@ -6,14 +6,16 @@
 //
 
 import UIKit
+import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
+    
+    static private(set) var shared: AppDelegate?
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        AppDelegate.shared = self
         return true
     }
 
@@ -25,12 +27,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
 
-    func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
-        // Called when the user discards a scene session.
-        // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
-        // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
+    func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) { }
+    
+    func applicationDidEnterBackground(_ application: UIApplication) {
+        saveContextIfNeeded()
+    }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        saveContextIfNeeded()
     }
 
-
+    lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "Library")
+        container.loadPersistentStores { _, error in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        }
+        container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        container.viewContext.automaticallyMergesChangesFromParent = true
+        return container
+    }()
+    
+    private func saveContextIfNeeded() {
+        let context = persistentContainer.viewContext
+        guard context.hasChanges else { return }
+        do {
+            try context.save()
+        } catch {
+            let nsError = error as NSError
+            assertionFailure("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+    }
 }
 
