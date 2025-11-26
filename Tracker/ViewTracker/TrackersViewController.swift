@@ -111,6 +111,7 @@ class TrackersViewController: UIViewController{
         configureNavigationBar()
         setupLayout()
         searchBar.delegate = self
+        setupKeyboardDismiss()
 
         datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
         
@@ -125,6 +126,17 @@ class TrackersViewController: UIViewController{
         trackerStore.delegate = self
         categoryStore.delegate = self
         recordStore.delegate = self
+    }
+    
+    private func setupKeyboardDismiss() {
+        // Скрываем клавиатуру при тапе на view
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
     }
     
     
@@ -156,6 +168,7 @@ class TrackersViewController: UIViewController{
         
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.keyboardDismissMode = .onDrag
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.identifier)
         collectionView.register(TrackersSectionHeader.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
