@@ -52,7 +52,7 @@ final class CreateTrackerTypeViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(resource: .appWhite)
         view.layer.cornerRadius = 16
         view.clipsToBounds = true
         configureUI()
@@ -113,4 +113,8 @@ final class CreateTrackerTypeViewController: UIViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
 
+}
+
+#Preview {
+    CreateTrackerTypeViewController()
 }

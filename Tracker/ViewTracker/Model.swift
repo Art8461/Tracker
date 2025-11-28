@@ -57,8 +57,6 @@ extension Weekday {
     
     static func from(date: Date, calendar: Calendar = Calendar.current) -> Weekday? {
         let weekday = calendar.component(.weekday, from: date)
-        // Calendar weekday: 1 - Sunday ... 7 - Saturday. Need Monday = 1
-        // Convert to ISO weekday where Monday = 1
         let isoWeekday = ((weekday + 5) % 7) + 1
         return Weekday(rawValue: isoWeekday)
     }

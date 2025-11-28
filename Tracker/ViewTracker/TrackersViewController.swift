@@ -23,11 +23,11 @@ class TrackersViewController: UIViewController{
     }()
 
     private lazy var addTrackerBarButtonItem: UIBarButtonItem = {
-        let item = UIBarButtonItem(image: UIImage(named: "Plus"),
+        let item = UIBarButtonItem(image: UIImage(resource: .plus),
                                    style: .plain,
                                    target: self,
                                    action: #selector(addTapped))
-        item.tintColor = UIColor(named: "AppBlack")
+        item.tintColor = UIColor(resource: .appBlack)
         return item
     }()
     
@@ -37,25 +37,28 @@ class TrackersViewController: UIViewController{
         sb.searchBarStyle = .minimal
         sb.translatesAutoresizingMaskIntoConstraints = false
         
-        sb.searchTextField.textColor = UIColor(red: 60/255, green: 60/255, blue: 67/255, alpha: 1.0)
+        sb.searchTextField.textColor = UIColor(resource: .appBlack)
+        
+        sb.searchTextField.backgroundColor = UIColor(resource: .appSearchBackgraund)
+
         sb.searchTextField.attributedPlaceholder = NSAttributedString(
             string: "Поиск",
             attributes: [
-                .foregroundColor: UIColor(red: 174/255, green: 175/255, blue: 180/255, alpha: 1.0),
+                .foregroundColor: UIColor(resource: .appGraySearch),
                 .font: UIFont.systemFont(ofSize: 17)
             ]
         )
         
         if let glassIconView = sb.searchTextField.leftView as? UIImageView {
             glassIconView.image = glassIconView.image?.withRenderingMode(.alwaysTemplate)
-            glassIconView.tintColor = UIColor(red: 174/255, green: 175/255, blue: 180/255, alpha: 1.0)
+            glassIconView.tintColor = UIColor(resource: .appGraySearch)
         }
         
         return sb
     }()
     
     private let emptyImageView: UIImageView = {
-        let iv = UIImageView(image: UIImage(named: "Star"))
+        let iv = UIImageView(image: UIImage(resource: .star))
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
     }()
@@ -64,7 +67,7 @@ class TrackersViewController: UIViewController{
         let label = UILabel()
         label.text = "Что будем отслеживать?"
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        label.textColor = UIColor(named: "AppBlack")
+        label.textColor = UIColor(resource: .appBlack)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -107,7 +110,7 @@ class TrackersViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(resource: .appWhite)
         configureNavigationBar()
         setupLayout()
         searchBar.delegate = self

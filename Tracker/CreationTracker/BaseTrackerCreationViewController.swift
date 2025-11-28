@@ -137,7 +137,7 @@ class BaseTrackerCreationViewController: UIViewController {
         button.setTitle("Отменить", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.systemRed, for: .normal)
-        button.backgroundColor = .white
+        button.backgroundColor = UIColor(resource: .appWhite)
         button.layer.cornerRadius = 16
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor(resource: .appRed).cgColor
@@ -150,8 +150,9 @@ class BaseTrackerCreationViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Создать", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor(resource: .appGrayButton)
+        button.setTitleColor(UIColor(resource: .appWhite), for: .normal)
+        button.setTitleColor(.white, for: .disabled)
+        button.backgroundColor = UIColor(resource: .appGray)
         button.layer.cornerRadius = 16
         button.isEnabled = false
         button.addTarget(self, action: #selector(createTapped), for: .touchUpInside)

@@ -107,4 +107,6 @@ extension CreateHabitViewController: ScheduleViewControllerDelegate {
                                 didUpdate weekdays: [Weekday]) {
         selectedSchedule = weekdays
     }
+    
 }
+

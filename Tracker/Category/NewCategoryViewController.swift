@@ -53,8 +53,9 @@ final class NewCategoryViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Готово", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor(resource: .appGrayButton)
+        button.setTitleColor(UIColor(resource: .appWhite), for: .normal)
+        button.setTitleColor(.white, for: .disabled)
+        button.backgroundColor = UIColor(resource: .appGray)
         button.layer.cornerRadius = 16
         button.isEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -66,7 +67,7 @@ final class NewCategoryViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(resource: .appWhite)
         navigationItem.title = "Новая категория"
         setupUI()
         setupKeyboardObservers()
@@ -184,7 +185,7 @@ final class NewCategoryViewController: UIViewController {
         doneButton.isEnabled = isValid
         doneButton.backgroundColor = isValid
         ? UIColor(resource: .appBlack)
-                  : UIColor(resource: .appGrayButton)
+                  : UIColor(resource: .appGray)
     }
 }
 
@@ -198,4 +199,5 @@ extension NewCategoryViewController: UITextFieldDelegate {
         return true
     }
 }
+
 

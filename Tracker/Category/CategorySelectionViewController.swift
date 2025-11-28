@@ -38,7 +38,7 @@ final class CategorySelectionViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Добавить категорию", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.setTitleColor(.white, for: .normal)
+        button.setTitleColor(UIColor(resource: .appWhite), for: .normal)
         button.backgroundColor = UIColor(resource: .appBlack)
         button.layer.cornerRadius = 16
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -88,7 +88,7 @@ final class CategorySelectionViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(resource: .appWhite)
         navigationItem.title = "Категория"
         setupEmptyState()
         setupDoneButton()
@@ -163,7 +163,6 @@ final class CategorySelectionViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func doneTapped() {
-        // Кнопка "Добавить категорию" всегда открывает экран создания категории
         presentNewCategoryViewController()
     }
     
@@ -224,8 +223,7 @@ extension CategorySelectionViewController: UITableViewDataSource {
         let category = categories[indexPath.row]
         cell.textLabel?.text = category
         cell.accessoryType = category == selectedCategory ? .checkmark : .none
-        cell.backgroundColor = tableBackgroundColor
-        cell.contentView.backgroundColor = tableBackgroundColor
+        cell.backgroundColor = UIColor(resource: .appGrayOsn)
         cell.selectionStyle = .default
         return cell
     }

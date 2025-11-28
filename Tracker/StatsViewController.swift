@@ -10,7 +10,7 @@ import UIKit
 class StatsViewController: UIViewController {
     
     private let emptyImageView: UIImageView = {
-        let iv = UIImageView(image: UIImage(named: "Smile"))
+        let iv = UIImageView(image: UIImage(resource: .smile))
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
     }()
@@ -19,7 +19,7 @@ class StatsViewController: UIViewController {
         let label = UILabel()
         label.text = "Анализировать пока нечего"
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        label.textColor = UIColor(named: "AppBlack")
+        label.textColor = UIColor(resource: .appBlack)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -28,7 +28,7 @@ class StatsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.setNavigationBarHidden(true, animated: false)
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(resource: .appWhite)
         setupLayout()
     }
     

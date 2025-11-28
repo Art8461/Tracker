@@ -37,7 +37,7 @@ final class ScheduleViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Готово", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.setTitleColor(.white, for: .normal)
+        button.setTitleColor(UIColor(resource: .appWhite), for: .normal)
         button.backgroundColor = UIColor(resource: .appBlack)
         button.layer.cornerRadius = 16
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -61,7 +61,7 @@ final class ScheduleViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(resource: .appWhite)
         navigationItem.title = "Расписание"
         setupDoneButton()
         setupTableView()
@@ -132,7 +132,7 @@ extension ScheduleViewController: UITableViewDataSource {
         toggle.isOn = selectedWeekdays.contains(weekday)
         toggle.tag = weekday.rawValue
         toggle.onTintColor = UIColor(resource: .appBlue)
-        toggle.thumbTintColor = .white
+        toggle.thumbTintColor = UIColor(resource: .appWhite)
         toggle.backgroundColor = UIColor(resource: .appGrayOsn100)
         toggle.layer.cornerRadius = 16
         toggle.clipsToBounds = true

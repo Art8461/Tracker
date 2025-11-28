@@ -31,7 +31,7 @@ final class TrackerCell: UICollectionViewCell {
     private let footerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(resource: .appWhite)
         view.layer.cornerRadius = 16
         view.layer.masksToBounds = true
         return view
@@ -57,7 +57,7 @@ final class TrackerCell: UICollectionViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .medium)
-        label.textColor = UIColor(named: "AppWhite")
+        label.textColor = .white
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -66,7 +66,7 @@ final class TrackerCell: UICollectionViewCell {
     private let daysLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .medium)
-        label.textColor = UIColor(named: "AppBlack") ?? UIColor.black
+        label.textColor = UIColor(resource: .appBlack)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -74,7 +74,7 @@ final class TrackerCell: UICollectionViewCell {
     private lazy var plusButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.tintColor = .white
+        button.tintColor = UIColor(resource: .appWhite)
         button.addTarget(self, action: #selector(didTapPlus), for: .touchUpInside)
         button.heightAnchor.constraint(equalToConstant: 34).isActive = true
         button.widthAnchor.constraint(equalToConstant: 34).isActive = true
