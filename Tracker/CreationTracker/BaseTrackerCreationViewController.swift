@@ -162,20 +162,9 @@ class BaseTrackerCreationViewController: UIViewController {
     
     // MARK: - Properties
     
+    let viewModel: TrackerCreationViewModel
+    private(set) var currentState: TrackerCreationState
     weak var creationDelegate: TrackerCreationDelegate?
-    var availableCategories: [String] = []
-    
-    var selectedCategory: String? {
-        didSet { updateCategorySubtitle() }
-    }
-    
-    var selectedEmoji: String? {
-        didSet { validateForm() }
-    }
-    
-    var selectedColorHex: String? {
-        didSet { validateForm() }
-    }
     
     let nameLimit = 38
     let gridItemsPerRow = 6
@@ -186,11 +175,25 @@ class BaseTrackerCreationViewController: UIViewController {
     var selectedEmojiIndexPath: IndexPath?
     var selectedColorIndexPath: IndexPath?
     
+    // MARK: - Init
+    
+    init(viewModel: TrackerCreationViewModel) {
+        self.viewModel = viewModel
+        self.currentState = viewModel.state
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        assertionFailure("init(coder:) has not been implemented")
+        return nil
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(resource: .appWhite)
+        bindViewModel()
         configureUI()
         setupKeyboardObservers()
     }
@@ -203,18 +206,6 @@ class BaseTrackerCreationViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         updateCollectionViewHeights()
-    }
-    
-    // MARK: - Abstract Methods
-    
-    /// Метод для получения расписания (переопределяется в подклассах)
-    func getSchedule() -> [Weekday] {
-        return []
-    }
-    
-    /// Метод для проверки валидности расписания (переопределяется в подклассах)
-    func isScheduleValid() -> Bool {
-        return true
     }
     
     /// Метод для настройки UI элементов, специфичных для подкласса
@@ -230,6 +221,10 @@ class BaseTrackerCreationViewController: UIViewController {
     /// Метод для получения отступа сверху для emojiTitleLabel
     func getEmojiTitleTopSpacing() -> CGFloat {
         return 32
+    }
+    
+    func stateDidUpdate(previous: TrackerCreationState, current: TrackerCreationState) {
+        // Переопределяется в подклассах при необходимости
     }
     
     // MARK: - UI Setup
@@ -346,27 +341,13 @@ class BaseTrackerCreationViewController: UIViewController {
     }
     
     func handleEmojiSelection(at indexPath: IndexPath) {
-        if selectedEmojiIndexPath == indexPath { return }
-        let previous = selectedEmojiIndexPath
-        selectedEmojiIndexPath = indexPath
-        selectedEmoji = MockData.emojis[indexPath.item]
-        var toReload = [indexPath]
-        if let previous = previous {
-            toReload.append(previous)
-        }
-        emojiCollectionView.reloadItems(at: toReload)
+        let emoji = MockData.emojis[indexPath.item]
+        viewModel.updateEmoji(emoji)
     }
     
     func handleColorSelection(at indexPath: IndexPath) {
-        if selectedColorIndexPath == indexPath { return }
-        let previous = selectedColorIndexPath
-        selectedColorIndexPath = indexPath
-        selectedColorHex = MockData.colors[indexPath.item]
-        var toReload = [indexPath]
-        if let previous = previous {
-            toReload.append(previous)
-        }
-        colorCollectionView.reloadItems(at: toReload)
+        let hex = MockData.colors[indexPath.item]
+        viewModel.updateColor(hex: hex)
     }
     
     func createSelectionButton(title: String, subtitle: String?) -> UIButton {
@@ -419,7 +400,7 @@ class BaseTrackerCreationViewController: UIViewController {
     // MARK: - Subtitle updates
     
     func updateCategorySubtitle() {
-        updateButton(categoryButton, subtitle: selectedCategory)
+        updateButton(categoryButton, subtitle: currentState.category)
     }
     
     func updateButton(_ button: UIButton, subtitle: String?) {
@@ -437,8 +418,6 @@ class BaseTrackerCreationViewController: UIViewController {
             s.text = subtitle
             stack.addArrangedSubview(s)
         }
-        
-        validateForm()
     }
     
     // MARK: - Keyboard
@@ -463,6 +442,82 @@ class BaseTrackerCreationViewController: UIViewController {
         view.addGestureRecognizer(tap)
     }
     
+    private func bindViewModel() {
+        viewModel.onStateChange = { [weak self] state in
+            DispatchQueue.main.async {
+                self?.apply(state: state)
+            }
+        }
+        viewModel.bind()
+    }
+    
+    private func apply(state: TrackerCreationState) {
+        let previousState = currentState
+        currentState = state
+        
+        if previousState.category != state.category {
+            updateCategorySubtitle()
+        }
+        
+        if previousState.emoji != state.emoji {
+            updateEmojiSelection(with: state.emoji)
+        }
+        
+        if previousState.colorHex != state.colorHex {
+            updateColorSelection(with: state.colorHex)
+        }
+        
+        updateCreateButtonState(isEnabled: state.isValid)
+        stateDidUpdate(previous: previousState, current: state)
+    }
+    
+    private func updateEmojiSelection(with emoji: String?) {
+        let previousIndex = selectedEmojiIndexPath
+        if let emoji,
+           let index = MockData.emojis.firstIndex(of: emoji) {
+            selectedEmojiIndexPath = IndexPath(item: index, section: 0)
+        } else {
+            selectedEmojiIndexPath = nil
+        }
+        
+        var indices = Set<IndexPath>()
+        if let previousIndex { indices.insert(previousIndex) }
+        if let currentIndex = selectedEmojiIndexPath { indices.insert(currentIndex) }
+        
+        guard indices.isEmpty == false else {
+            emojiCollectionView.reloadData()
+            return
+        }
+        emojiCollectionView.reloadItems(at: Array(indices))
+    }
+    
+    private func updateColorSelection(with colorHex: String?) {
+        let previousIndex = selectedColorIndexPath
+        if let colorHex,
+           let index = MockData.colors.firstIndex(of: colorHex) {
+            selectedColorIndexPath = IndexPath(item: index, section: 0)
+        } else {
+            selectedColorIndexPath = nil
+        }
+        
+        var indices = Set<IndexPath>()
+        if let previousIndex { indices.insert(previousIndex) }
+        if let currentIndex = selectedColorIndexPath { indices.insert(currentIndex) }
+        
+        guard indices.isEmpty == false else {
+            colorCollectionView.reloadData()
+            return
+        }
+        colorCollectionView.reloadItems(at: Array(indices))
+    }
+    
+    private func updateCreateButtonState(isEnabled: Bool) {
+        createButton.isEnabled = isEnabled
+        createButton.backgroundColor = isEnabled
+        ? UIColor(resource: .appBlack)
+        : UIColor(resource: .appGray)
+    }
+    
     @objc func keyboardWillShow(notification: NSNotification) {
         guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
         scrollView.contentInset.bottom = frame.height
@@ -481,8 +536,9 @@ class BaseTrackerCreationViewController: UIViewController {
     // MARK: - Actions
     
     @objc func nameFieldEditingChanged() {
-        updateNameLimitLabel(for: nameTextField.text ?? "")
-        validateForm()
+        let text = nameTextField.text ?? ""
+        updateNameLimitLabel(for: text)
+        viewModel.updateName(text)
     }
     
     func updateNameLimitLabel(for text: String) {
@@ -490,8 +546,9 @@ class BaseTrackerCreationViewController: UIViewController {
     }
     
     @objc func categoryTapped() {
-        let controller = CategorySelectionViewController(categories: availableCategories,
-                                                         selectedCategory: selectedCategory)
+        let selectionViewModel = CategorySelectionViewModel(categories: currentState.availableCategories,
+                                                            selectedCategory: currentState.category)
+        let controller = CategorySelectionViewController(viewModel: selectionViewModel)
         controller.delegate = self
         let nav = UINavigationController(rootViewController: controller)
         present(nav, animated: true)
@@ -502,37 +559,9 @@ class BaseTrackerCreationViewController: UIViewController {
     }
     
     @objc func createTapped() {
-        guard
-            let title = nameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
-            !title.isEmpty,
-            let category = selectedCategory,
-            let emoji = selectedEmoji,
-            let colorHex = selectedColorHex
-        else { return }
-        
-        let tracker = Tracker(id: UUID(),
-                              title: title,
-                              colorHex: colorHex,
-                              emoji: emoji,
-                              schedule: getSchedule())
-        creationDelegate?.trackerCreationDidCreate(tracker, in: category)
+        guard let result = viewModel.makeTracker() else { return }
+        creationDelegate?.trackerCreationDidCreate(result.tracker, in: result.categoryTitle)
         dismissCreationFlow()
-    }
-    
-    func validateForm() {
-        let trimmedName = nameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let nameValid = !trimmedName.isEmpty
-        let categoryValid = selectedCategory != nil
-        let scheduleValid = isScheduleValid()
-        let emojiValid = selectedEmoji != nil
-        let colorValid = selectedColorHex != nil
-        
-        let valid = nameValid && categoryValid && scheduleValid && emojiValid && colorValid
-        
-        createButton.isEnabled = valid
-        createButton.backgroundColor = valid
-            ? UIColor(resource: .appBlack)
-            : UIColor(resource: .appGray)
     }
     
     func dismissCreationFlow() {
@@ -567,8 +596,7 @@ extension BaseTrackerCreationViewController: CategorySelectionViewControllerDele
     func categorySelection(_ viewController: CategorySelectionViewController,
                            didSelect category: String,
                            categories: [String]) {
-        availableCategories = categories
-        selectedCategory = category
+        viewModel.updateCategory(category, categories: categories)
     }
 }
 

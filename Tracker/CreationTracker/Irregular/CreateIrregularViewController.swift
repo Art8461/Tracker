@@ -9,6 +9,17 @@ import UIKit
 
 final class CreateIrregularViewController: BaseTrackerCreationViewController {
     
+    // MARK: - Init
+    
+    override init(viewModel: TrackerCreationViewModel = TrackerCreationViewModel(type: .irregular)) {
+        super.init(viewModel: viewModel)
+    }
+    
+    required init?(coder: NSCoder) {
+        assertionFailure("init(coder:) has not been implemented")
+        return nil
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -20,13 +31,5 @@ final class CreateIrregularViewController: BaseTrackerCreationViewController {
     
     override func getElementAboveEmojiTitle() -> UIView {
         return categoryButton
-    }
-    
-    override func getSchedule() -> [Weekday] {
-        return []
-    }
-    
-    override func isScheduleValid() -> Bool {
-        return true
     }
 }

@@ -12,8 +12,18 @@ final class CreateTrackerTypeViewController: UIViewController {
     // MARK: - UI Elements
     
     weak var creationDelegate: TrackerCreationDelegate?
-    var availableCategories: [String] = []
+    private let viewModel: CreateTrackerTypeViewModel
 
+    init(viewModel: CreateTrackerTypeViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        assertionFailure("init(coder:) has not been implemented")
+        return nil
+    }
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Создание трекера"
@@ -100,21 +110,21 @@ final class CreateTrackerTypeViewController: UIViewController {
     // MARK: - Actions
 
     @objc private func habitTapped() {
-        let vc = CreateHabitViewController()
+        let creationViewModel = viewModel.habitsViewModel()
+        let vc = CreateHabitViewController(viewModel: creationViewModel)
         vc.creationDelegate = creationDelegate
-        vc.availableCategories = availableCategories
         navigationController?.pushViewController(vc, animated: true)
     }
 
     @objc private func irregularTapped() {
-        let vc = CreateIrregularViewController()
+        let creationViewModel = viewModel.irregularViewModel()
+        let vc = CreateIrregularViewController(viewModel: creationViewModel)
         vc.creationDelegate = creationDelegate
-        vc.availableCategories = availableCategories
         navigationController?.pushViewController(vc, animated: true)
     }
 
 }
 
 #Preview {
-    CreateTrackerTypeViewController()
+    CreateTrackerTypeViewController(viewModel: CreateTrackerTypeViewModel(categories: []))
 }

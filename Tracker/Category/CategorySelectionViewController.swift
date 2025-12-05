@@ -19,8 +19,8 @@ final class CategorySelectionViewController: UIViewController {
     
     weak var delegate: CategorySelectionViewControllerDelegate?
     
-    private var categories: [String]
-    private var selectedCategory: String?
+    private let viewModel: CategorySelectionViewModel
+    private var state: CategorySelectionState
     
     private let tableBackgroundColor = UIColor(resource: .appGrayOsn)
     
@@ -73,9 +73,9 @@ final class CategorySelectionViewController: UIViewController {
     
     // MARK: - Init
     
-    init(categories: [String], selectedCategory: String?) {
-        self.categories = categories
-        self.selectedCategory = selectedCategory
+    init(viewModel: CategorySelectionViewModel) {
+        self.viewModel = viewModel
+        self.state = viewModel.state
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -93,6 +93,7 @@ final class CategorySelectionViewController: UIViewController {
         setupEmptyState()
         setupDoneButton()
         setupTableView()
+        bindViewModel()
         updateUI()
     }
     
@@ -136,6 +137,21 @@ final class CategorySelectionViewController: UIViewController {
         ])
     }
     
+    private func bindViewModel() {
+        viewModel.onStateChange = { [weak self] newState in
+            DispatchQueue.main.async {
+                self?.apply(state: newState)
+            }
+        }
+        viewModel.bind()
+    }
+    
+    private func apply(state: CategorySelectionState) {
+        self.state = state
+        tableView.reloadData()
+        updateUI()
+    }
+    
     private func setupDoneButton() {
         view.addSubview(doneButton)
         NSLayoutConstraint.activate([
@@ -147,7 +163,7 @@ final class CategorySelectionViewController: UIViewController {
     }
     
     private func updateUI() {
-        let hasCategories = !categories.isEmpty
+        let hasCategories = !state.categories.isEmpty
         
         // Показываем/скрываем заглушку
         emptyStateView.isHidden = hasCategories
@@ -173,8 +189,9 @@ final class CategorySelectionViewController: UIViewController {
         present(navController, animated: true)
     }
     
-    private func notifyDelegateAndDismiss(with category: String) {
-        delegate?.categorySelection(self, didSelect: category, categories: categories)
+    private func notifyDelegateAndDismiss(with category: String, categories: [String]? = nil) {
+        let list = categories ?? state.categories
+        delegate?.categorySelection(self, didSelect: category, categories: list)
         dismiss(animated: true)
     }
     
@@ -182,27 +199,20 @@ final class CategorySelectionViewController: UIViewController {
         let trimmedName = categoryName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedName.isEmpty else { return }
         
-        // Проверяем, не существует ли уже такая категория
-        guard !categories.contains(where: { $0.caseInsensitiveCompare(trimmedName) == .orderedSame }) else {
-            // Если категория уже существует, просто выбираем её
-            selectedCategory = trimmedName
-            tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
-            updateUI()
-            // Автоматически возвращаемся в настройки трекера
-            notifyDelegateAndDismiss(with: trimmedName)
+        let wasEmpty = state.categories.isEmpty
+        let alreadyExists = state.categories.contains {
+            $0.caseInsensitiveCompare(trimmedName) == .orderedSame
+        }
+        
+        viewModel.addCategory(trimmedName)
+        
+        if alreadyExists {
+            notifyDelegateAndDismiss(with: trimmedName, categories: viewModel.categories())
             return
         }
         
-        // Добавляем новую категорию
-        let wasEmpty = categories.isEmpty
-        categories.append(trimmedName)
-        selectedCategory = trimmedName
-        tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
-        updateUI()
-        
-        // Если список был пуст, автоматически возвращаемся в настройки трекера
         if wasEmpty {
-            notifyDelegateAndDismiss(with: trimmedName)
+            notifyDelegateAndDismiss(with: trimmedName, categories: viewModel.categories())
         }
     }
 }
@@ -215,14 +225,14 @@ extension CategorySelectionViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        categories.count
+        state.categories.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-        let category = categories[indexPath.row]
+        let category = state.categories[indexPath.row]
         cell.textLabel?.text = category
-        cell.accessoryType = category == selectedCategory ? .checkmark : .none
+        cell.accessoryType = category == state.selectedCategory ? .checkmark : .none
         cell.backgroundColor = UIColor(resource: .appGrayOsn)
         cell.selectionStyle = .default
         return cell
@@ -238,11 +248,9 @@ extension CategorySelectionViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let category = categories[indexPath.row]
-        selectedCategory = category
-        tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
-        // Автоматически возвращаемся в настройки трекера при выборе категории
-        notifyDelegateAndDismiss(with: category)
+        let category = state.categories[indexPath.row]
+        viewModel.selectCategory(at: indexPath.row)
+        notifyDelegateAndDismiss(with: category, categories: state.categories)
     }
 }
 
