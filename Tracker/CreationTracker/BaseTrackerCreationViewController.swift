@@ -546,8 +546,7 @@ class BaseTrackerCreationViewController: UIViewController {
     }
     
     @objc func categoryTapped() {
-        let selectionViewModel = CategorySelectionViewModel(categories: currentState.availableCategories,
-                                                            selectedCategory: currentState.category)
+        let selectionViewModel = CategorySelectionViewModel(selectedCategory: currentState.category)
         let controller = CategorySelectionViewController(viewModel: selectionViewModel)
         controller.delegate = self
         let nav = UINavigationController(rootViewController: controller)

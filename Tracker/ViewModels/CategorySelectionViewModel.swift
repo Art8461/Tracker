@@ -9,31 +9,53 @@ struct CategorySelectionState {
     }
 }
 
-final class CategorySelectionViewModel {
+final class CategorySelectionViewModel: NSObject {
     
     var onStateChange: ((CategorySelectionState) -> Void)?
+    var onCategorySelected: ((String, [String]) -> Void)?
+    var onError: ((String) -> Void)?
+    
+    private let store: TrackerCategoryStore
     
     private(set) var state: CategorySelectionState {
         didSet {
-            onStateChange?(state)
+            let currentState = state
+            DispatchQueue.main.async { [weak self] in
+                self?.onStateChange?(currentState)
+            }
         }
     }
     
-    init(categories: [String], selectedCategory: String?) {
-        self.state = CategorySelectionState(categories: categories, selectedCategory: selectedCategory)
+    init(selectedCategory: String?,
+         store: TrackerCategoryStore = TrackerCategoryStore()) {
+        self.store = store
+        self.state = CategorySelectionState(categories: [], selectedCategory: selectedCategory)
+        super.init()
+        self.store.delegate = self
     }
     
     func bind() {
-        onStateChange?(state)
+        reloadCategories()
     }
     
-    func selectCategory(at index: Int) {
+    func numberOfCategories() -> Int {
+        state.categories.count
+    }
+    
+    func titleForCategory(at index: Int) -> String? {
+        guard index < state.categories.count else { return nil }
+        return state.categories[index]
+    }
+    
+    func selectCategory(at index: Int, notifyDelegate: Bool = true) {
         guard index < state.categories.count else { return }
         let category = state.categories[index]
         state = CategorySelectionState(categories: state.categories, selectedCategory: category)
+        guard notifyDelegate else { return }
+        notifySelection(with: category)
     }
     
-    func addCategory(_ title: String) {
+    func createCategory(_ title: String) {
         let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard trimmed.isEmpty == false else { return }
         
@@ -42,17 +64,60 @@ final class CategorySelectionViewModel {
             return
         }
         
-        var updated = state.categories
-        updated.append(trimmed)
-        state = CategorySelectionState(categories: updated, selectedCategory: trimmed)
+        do {
+            try store.createCategory(title: trimmed)
+            reloadCategories()
+            selectCategoryIfPossible(with: trimmed)
+        } catch {
+            handle(error: error)
+        }
     }
     
-    func categories() -> [String] {
-        state.categories
+    private func reloadCategories() {
+        let titles = store.categories.map { $0.title }
+        let selected = state.selectedCategory.flatMap { selectedTitle in
+            titles.first(where: { $0.caseInsensitiveCompare(selectedTitle) == .orderedSame })
+        }
+        state = CategorySelectionState(categories: titles, selectedCategory: selected)
     }
     
-    func selectedCategoryTitle() -> String? {
-        state.selectedCategory
+    private func selectCategoryIfPossible(with title: String) {
+        guard let index = state.categories.firstIndex(where: { $0.caseInsensitiveCompare(title) == .orderedSame }) else {
+            return
+        }
+        selectCategory(at: index, notifyDelegate: false)
+    }
+    
+    private func notifySelection(with category: String) {
+        let categories = state.categories
+        DispatchQueue.main.async { [weak self] in
+            self?.onCategorySelected?(category, categories)
+        }
+    }
+    
+    private func handle(error: Error) {
+        let message: String
+        if let storeError = error as? TrackerCategoryStoreError {
+            switch storeError {
+            case .duplicateTitle:
+                message = "Такая категория уже существует."
+            case .invalidTitle:
+                message = "Введите корректное название категории."
+            case .categoryNotFound:
+                message = "Категория не найдена."
+            }
+        } else {
+            message = "Не удалось сохранить категорию. Попробуйте ещё раз."
+        }
+        DispatchQueue.main.async { [weak self] in
+            self?.onError?(message)
+        }
+    }
+}
+
+extension CategorySelectionViewModel: TrackerCategoryStoreDelegate {
+    func trackerCategoryStoreDidChange(_ store: TrackerCategoryStore) {
+        reloadCategories()
     }
 }
 

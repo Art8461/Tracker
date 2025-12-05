@@ -28,6 +28,7 @@ final class ScheduleViewController: UIViewController {
         table.translatesAutoresizingMaskIntoConstraints = false
         table.separatorStyle = .singleLine
         table.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        table.separatorColor = UIColor(resource: .appGray)
         table.backgroundColor = UIColor(resource: .appWhite)
         table.tableHeaderView = UIView(frame: .zero)
         table.tableFooterView = UIView(frame: .zero)

@@ -21,16 +21,26 @@ final class CategorySelectionViewController: UIViewController {
     
     private let viewModel: CategorySelectionViewModel
     private var state: CategorySelectionState
+    private var tableHeightConstraint: NSLayoutConstraint?
     
-    private let tableBackgroundColor = UIColor(resource: .appGrayOsn)
+    private let tableContainerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .clear
+        view.layer.cornerRadius = 16
+        view.layer.masksToBounds = true
+        view.isHidden = true
+        return view
+    }()
     
     private lazy var tableView: UITableView = {
-        let table = UITableView(frame: .zero, style: .insetGrouped)
+        let table = UITableView(frame: .zero, style: .plain)
         table.translatesAutoresizingMaskIntoConstraints = false
         table.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        table.backgroundColor = tableBackgroundColor
-        table.tableHeaderView = UIView(frame: .zero)
-        table.tableFooterView = UIView(frame: .zero)
+        table.separatorColor = UIColor(resource: .appGray)
+        table.backgroundColor = UIColor(resource: .appGrayOsn)
+        table.layer.cornerRadius = 16
+        table.layer.masksToBounds = true
         return table
     }()
     
@@ -125,30 +135,50 @@ final class CategorySelectionViewController: UIViewController {
     private func setupTableView() {
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CategoryCell")
-        tableView.backgroundColor = UIColor(resource: .appWhite)
-        view.addSubview(tableView)
+        tableView.separatorStyle = .singleLine
+        tableView.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.reuseIdentifier)
+        tableView.rowHeight = 75
+        tableView.isScrollEnabled = false
+        
+        view.addSubview(tableContainerView)
+        tableContainerView.addSubview(tableView)
         
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: doneButton.topAnchor, constant: -16)
+            tableContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            tableContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            tableContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            tableContainerView.bottomAnchor.constraint(lessThanOrEqualTo: doneButton.topAnchor, constant: -16),
+            
+            tableView.topAnchor.constraint(equalTo: tableContainerView.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: tableContainerView.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: tableContainerView.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: tableContainerView.bottomAnchor)
         ])
+        
+        tableHeightConstraint = tableView.heightAnchor.constraint(equalToConstant: 0)
+        tableHeightConstraint?.isActive = true
     }
     
     private func bindViewModel() {
         viewModel.onStateChange = { [weak self] newState in
-            DispatchQueue.main.async {
-                self?.apply(state: newState)
-            }
+            self?.apply(state: newState)
         }
+        
+        viewModel.onCategorySelected = { [weak self] category, categories in
+            self?.notifyDelegateAndDismiss(with: category, categories: categories)
+        }
+        
+        viewModel.onError = { [weak self] message in
+            self?.presentError(message)
+        }
+        
         viewModel.bind()
     }
     
     private func apply(state: CategorySelectionState) {
         self.state = state
         tableView.reloadData()
+        updateTableHeight()
         updateUI()
     }
     
@@ -167,6 +197,7 @@ final class CategorySelectionViewController: UIViewController {
         
         // Показываем/скрываем заглушку
         emptyStateView.isHidden = hasCategories
+        tableContainerView.isHidden = !hasCategories
         tableView.isHidden = !hasCategories
         
         // Кнопка "Добавить категорию" всегда активна
@@ -189,31 +220,26 @@ final class CategorySelectionViewController: UIViewController {
         present(navController, animated: true)
     }
     
-    private func notifyDelegateAndDismiss(with category: String, categories: [String]? = nil) {
-        let list = categories ?? state.categories
-        delegate?.categorySelection(self, didSelect: category, categories: list)
+    private func notifyDelegateAndDismiss(with category: String, categories: [String]) {
+        delegate?.categorySelection(self, didSelect: category, categories: categories)
         dismiss(animated: true)
     }
     
-    private func addCategory(_ categoryName: String) {
-        let trimmedName = categoryName.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedName.isEmpty else { return }
-        
-        let wasEmpty = state.categories.isEmpty
-        let alreadyExists = state.categories.contains {
-            $0.caseInsensitiveCompare(trimmedName) == .orderedSame
-        }
-        
-        viewModel.addCategory(trimmedName)
-        
-        if alreadyExists {
-            notifyDelegateAndDismiss(with: trimmedName, categories: viewModel.categories())
-            return
-        }
-        
-        if wasEmpty {
-            notifyDelegateAndDismiss(with: trimmedName, categories: viewModel.categories())
-        }
+    private func presentError(_ message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateTableHeight()
+    }
+    
+    private func updateTableHeight() {
+        tableView.layoutIfNeeded()
+        let height = state.categories.isEmpty ? 0 : tableView.contentSize.height
+        tableHeightConstraint?.constant = height
     }
 }
 
@@ -229,12 +255,11 @@ extension CategorySelectionViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.reuseIdentifier, for: indexPath) as? CategoryCell else {
+            return UITableViewCell()
+        }
         let category = state.categories[indexPath.row]
-        cell.textLabel?.text = category
-        cell.accessoryType = category == state.selectedCategory ? .checkmark : .none
-        cell.backgroundColor = UIColor(resource: .appGrayOsn)
-        cell.selectionStyle = .default
+        cell.configure(title: category, isSelected: category == state.selectedCategory)
         return cell
     }
 }
@@ -248,9 +273,7 @@ extension CategorySelectionViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let category = state.categories[indexPath.row]
         viewModel.selectCategory(at: indexPath.row)
-        notifyDelegateAndDismiss(with: category, categories: state.categories)
     }
 }
 
@@ -259,6 +282,6 @@ extension CategorySelectionViewController: UITableViewDelegate {
 extension CategorySelectionViewController: NewCategoryViewControllerDelegate {
     func newCategoryViewController(_ viewController: NewCategoryViewController,
                                  didCreate category: String) {
-        addCategory(category)
+        viewModel.createCategory(category)
     }
 }
