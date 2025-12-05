@@ -44,7 +44,7 @@ final class CreateHabitViewController: BaseTrackerCreationViewController {
         super.viewDidLoad()
         titleLabel.text = "Новая привычка"
         categoryButton.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        updateScheduleSubtitle()
+        updateScheduleSubtitle(with: viewModel.state.schedule)
     }
     
     // MARK: - Override Methods
@@ -73,7 +73,7 @@ final class CreateHabitViewController: BaseTrackerCreationViewController {
     // MARK: - Actions
     
     @objc private func scheduleTapped() {
-        let scheduleViewModel = ScheduleViewModel(selectedWeekdays: Set(currentState.schedule))
+        let scheduleViewModel = ScheduleViewModel(selectedWeekdays: Set(viewModel.state.schedule))
         let controller = ScheduleViewController(viewModel: scheduleViewModel)
         controller.delegate = self
         let nav = UINavigationController(rootViewController: controller)
@@ -82,8 +82,7 @@ final class CreateHabitViewController: BaseTrackerCreationViewController {
     
     // MARK: - Subtitle updates
     
-    private func updateScheduleSubtitle() {
-        let schedule = currentState.schedule
+    private func updateScheduleSubtitle(with schedule: [Weekday]) {
         guard !schedule.isEmpty else {
             updateButton(scheduleButton, subtitle: nil)
             return
@@ -99,10 +98,10 @@ final class CreateHabitViewController: BaseTrackerCreationViewController {
         }
     }
     
-    override func stateDidUpdate(previous: TrackerCreationState, current: TrackerCreationState) {
+    override func stateDidUpdate(previous: TrackerCreationState?, current: TrackerCreationState) {
         super.stateDidUpdate(previous: previous, current: current)
-        if previous.schedule != current.schedule {
-            updateScheduleSubtitle()
+        if previous?.schedule != current.schedule {
+            updateScheduleSubtitle(with: current.schedule)
         }
     }
 }

@@ -22,6 +22,7 @@ struct TrackerCreationState {
     var colorHex: String?
     var schedule: [Weekday]
     var availableCategories: [String]
+    let nameCharacterLimit: Int
     
     var trimmedName: String {
         name.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -30,6 +31,14 @@ struct TrackerCreationState {
     var isNameValid: Bool {
         trimmedName.isEmpty == false
     }
+
+    var isNameLengthValid: Bool {
+        name.count <= nameCharacterLimit
+    }
+
+    var shouldShowNameLimitWarning: Bool {
+        name.count > nameCharacterLimit
+    }
     
     var isScheduleValid: Bool {
         type.requiresSchedule ? schedule.isEmpty == false : true
@@ -37,6 +46,7 @@ struct TrackerCreationState {
     
     var isValid: Bool {
         isNameValid
+        && isNameLengthValid
         && category != nil
         && emoji != nil
         && colorHex != nil
@@ -51,11 +61,16 @@ struct TrackerCreationState {
         let sorted = schedule.sorted { $0.rawValue < $1.rawValue }
         return sorted.map { $0.shortTitle }.joined(separator: ", ")
     }
+
+    var nameLimitText: String {
+        "Ограничение \(nameCharacterLimit) символов"
+    }
 }
 
 final class TrackerCreationViewModel {
     
     var onStateChange: ((TrackerCreationState) -> Void)?
+    private let nameCharacterLimit = 38
     
     private(set) var state: TrackerCreationState {
         didSet {
@@ -70,7 +85,8 @@ final class TrackerCreationViewModel {
                                           emoji: nil,
                                           colorHex: nil,
                                           schedule: [],
-                                          availableCategories: availableCategories)
+                                          availableCategories: availableCategories,
+                                          nameCharacterLimit: nameCharacterLimit)
     }
     
     func bind() {

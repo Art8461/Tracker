@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TrackersViewController: UIViewController{
+final class TrackersViewController: UIViewController{
 
     // MARK: - UI Elements
 
@@ -88,7 +88,6 @@ class TrackersViewController: UIViewController{
     }()
 
     private let viewModel = TrackersViewModel()
-    private var sections: [TrackersViewModel.Section] = []
     
     private func configureNavigationBar() {
         title = "Трекеры"
@@ -129,7 +128,6 @@ class TrackersViewController: UIViewController{
         viewModel.onStateChange = { [weak self] state in
             DispatchQueue.main.async {
                 guard let self else { return }
-                self.sections = state.sections
                 self.collectionView.reloadData()
                 self.updateEmptyState(hasTrackers: state.hasTrackers)
                 self.datePicker.date = self.viewModel.currentDate
@@ -210,10 +208,11 @@ class TrackersViewController: UIViewController{
     // MARK: - Data
     
     private func configureCell(_ cell: TrackerCell, at indexPath: IndexPath) {
-        guard let cellViewModel = viewModel.cellViewModel(at: indexPath) else { return }
+        guard let cellViewModel = viewModel.cellViewModel(section: indexPath.section, item: indexPath.item) else { return }
+        let color = UIColor(hex: cellViewModel.colorHex) ?? UIColor(resource: .appGrayOsn100)
         cell.configure(with: cellViewModel.tracker,
                        daysText: cellViewModel.daysText,
-                       color: cellViewModel.color,
+                       color: color,
                        isCompleted: cellViewModel.isCompleted,
                        isButtonEnabled: cellViewModel.isButtonEnabled)
         cell.plusAction = { [weak self] in
@@ -226,12 +225,11 @@ class TrackersViewController: UIViewController{
 extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return sections.count
+        viewModel.numberOfSections()
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard section < sections.count else { return 0 }
-        return sections[section].trackers.count
+        viewModel.numberOfItems(in: section)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -264,8 +262,8 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
                                                                            for: indexPath) as? TrackersSectionHeader else {
             return UICollectionReusableView()
         }
-        if indexPath.section < sections.count {
-            header.configure(title: sections[indexPath.section].title)
+        if let title = viewModel.sectionTitle(for: indexPath.section) {
+            header.configure(title: title)
         }
         return header
     }
@@ -273,7 +271,7 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForHeaderInSection section: Int) -> CGSize {
-        guard section < sections.count else { return .zero }
+        guard viewModel.sectionTitle(for: section) != nil else { return .zero }
         return CGSize(width: collectionView.bounds.width, height: 22)
     }
 }

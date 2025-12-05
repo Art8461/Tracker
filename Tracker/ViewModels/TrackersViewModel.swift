@@ -1,4 +1,4 @@
-import UIKit
+import Foundation
 
 struct TrackersViewState {
     let sections: [TrackersViewModel.Section]
@@ -15,7 +15,7 @@ final class TrackersViewModel: NSObject {
     struct CellViewModel {
         let tracker: Tracker
         let daysText: String
-        let color: UIColor
+        let colorHex: String
         let isCompleted: Bool
         let isButtonEnabled: Bool
     }
@@ -82,24 +82,24 @@ final class TrackersViewModel: NSObject {
         return state.sections[section].title
     }
     
-    func tracker(at indexPath: IndexPath) -> Tracker? {
-        guard indexPath.section < state.sections.count else { return nil }
-        let trackers = state.sections[indexPath.section].trackers
-        guard indexPath.item < trackers.count else { return nil }
-        return trackers[indexPath.item]
+    func tracker(section: Int, item: Int) -> Tracker? {
+        guard section < state.sections.count else { return nil }
+        let trackers = state.sections[section].trackers
+        guard item < trackers.count else { return nil }
+        return trackers[item]
     }
     
-    func cellViewModel(at indexPath: IndexPath) -> CellViewModel? {
-        guard let tracker = tracker(at: indexPath) else { return nil }
+    func cellViewModel(section: Int, item: Int) -> CellViewModel? {
+        guard let tracker = tracker(section: section, item: item) else { return nil }
         let normalizedDate = normalized(date: currentDate)
         let isCompleted = recordStore.isCompleted(trackerId: tracker.id, date: normalizedDate)
         let count = completedCount(for: tracker)
         let text = formattedDaysText(for: count)
-        let color = color(for: tracker)
+        let colorHex = tracker.colorHex
         let enabled = !isFuture(date: normalizedDate)
         return CellViewModel(tracker: tracker,
                              daysText: text,
-                             color: color,
+                             colorHex: colorHex,
                              isCompleted: isCompleted,
                              isButtonEnabled: enabled)
     }
@@ -181,10 +181,6 @@ final class TrackersViewModel: NSObject {
             }
         }
         return "\(count) \(suffix)"
-    }
-    
-    private func color(for tracker: Tracker) -> UIColor {
-        UIColor(hex: tracker.colorHex) ?? UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
     }
     
     private func isFuture(date: Date) -> Bool {

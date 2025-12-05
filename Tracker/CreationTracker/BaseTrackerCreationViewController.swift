@@ -163,10 +163,9 @@ class BaseTrackerCreationViewController: UIViewController {
     // MARK: - Properties
     
     let viewModel: TrackerCreationViewModel
-    private(set) var currentState: TrackerCreationState
+    private var lastState: TrackerCreationState?
     weak var creationDelegate: TrackerCreationDelegate?
     
-    let nameLimit = 38
     let gridItemsPerRow = 6
     let gridSpacing: CGFloat = 0
     
@@ -179,7 +178,6 @@ class BaseTrackerCreationViewController: UIViewController {
     
     init(viewModel: TrackerCreationViewModel) {
         self.viewModel = viewModel
-        self.currentState = viewModel.state
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -223,7 +221,7 @@ class BaseTrackerCreationViewController: UIViewController {
         return 32
     }
     
-    func stateDidUpdate(previous: TrackerCreationState, current: TrackerCreationState) {
+    func stateDidUpdate(previous: TrackerCreationState?, current: TrackerCreationState) {
         // Переопределяется в подклассах при необходимости
     }
     
@@ -399,8 +397,13 @@ class BaseTrackerCreationViewController: UIViewController {
     
     // MARK: - Subtitle updates
     
-    func updateCategorySubtitle() {
-        updateButton(categoryButton, subtitle: currentState.category)
+    func updateCategorySubtitle(with category: String?) {
+        updateButton(categoryButton, subtitle: category)
+    }
+    
+    private func updateNameLimitLabel(for state: TrackerCreationState) {
+        characterLimitLabel.text = state.nameLimitText
+        characterLimitLabel.isHidden = state.isNameLengthValid
     }
     
     func updateButton(_ button: UIButton, subtitle: String?) {
@@ -452,21 +455,24 @@ class BaseTrackerCreationViewController: UIViewController {
     }
     
     private func apply(state: TrackerCreationState) {
-        let previousState = currentState
-        currentState = state
+        let previousState = lastState
+        lastState = state
         
-        if previousState.category != state.category {
-            updateCategorySubtitle()
+        if previousState?.category != state.category {
+            updateCategorySubtitle(with: state.category)
+        } else if previousState == nil {
+            updateCategorySubtitle(with: state.category)
         }
         
-        if previousState.emoji != state.emoji {
+        if previousState?.emoji != state.emoji {
             updateEmojiSelection(with: state.emoji)
         }
         
-        if previousState.colorHex != state.colorHex {
+        if previousState?.colorHex != state.colorHex {
             updateColorSelection(with: state.colorHex)
         }
         
+        updateNameLimitLabel(for: state)
         updateCreateButtonState(isEnabled: state.isValid)
         stateDidUpdate(previous: previousState, current: state)
     }
@@ -536,17 +542,11 @@ class BaseTrackerCreationViewController: UIViewController {
     // MARK: - Actions
     
     @objc func nameFieldEditingChanged() {
-        let text = nameTextField.text ?? ""
-        updateNameLimitLabel(for: text)
-        viewModel.updateName(text)
-    }
-    
-    func updateNameLimitLabel(for text: String) {
-        characterLimitLabel.isHidden = text.count <= nameLimit
+        viewModel.updateName(nameTextField.text ?? "")
     }
     
     @objc func categoryTapped() {
-        let selectionViewModel = CategorySelectionViewModel(selectedCategory: currentState.category)
+        let selectionViewModel = CategorySelectionViewModel(selectedCategory: viewModel.state.category)
         let controller = CategorySelectionViewController(viewModel: selectionViewModel)
         controller.delegate = self
         let nav = UINavigationController(rootViewController: controller)
@@ -578,14 +578,6 @@ extension BaseTrackerCreationViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
-    }
-    
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        let current = textField.text ?? ""
-        guard let stringRange = Range(range, in: current) else { return false }
-        let updatedText = current.replacingCharacters(in: stringRange, with: string)
-        updateNameLimitLabel(for: updatedText)
-        return updatedText.count <= nameLimit
     }
 }
 
