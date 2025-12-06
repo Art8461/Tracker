@@ -20,8 +20,8 @@ final class CategorySelectionViewModel: NSObject {
     private(set) var state: CategorySelectionState {
         didSet {
             let currentState = state
-            DispatchQueue.main.async { [weak self] in
-                self?.onStateChange?(currentState)
+            DispatchQueue.main.async {
+                self.onStateChange?(currentState)
             }
         }
     }
@@ -90,8 +90,8 @@ final class CategorySelectionViewModel: NSObject {
     
     private func notifySelection(with category: String) {
         let categories = state.categories
-        DispatchQueue.main.async { [weak self] in
-            self?.onCategorySelected?(category, categories)
+        DispatchQueue.main.async {
+            self.onCategorySelected?(category, categories)
         }
     }
     
@@ -109,8 +109,8 @@ final class CategorySelectionViewModel: NSObject {
         } else {
             message = "Не удалось сохранить категорию. Попробуйте ещё раз."
         }
-        DispatchQueue.main.async { [weak self] in
-            self?.onError?(message)
+        DispatchQueue.main.async {
+            self.onError?(message)
         }
     }
 }
