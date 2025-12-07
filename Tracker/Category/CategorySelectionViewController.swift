@@ -135,7 +135,7 @@ final class CategorySelectionViewController: UIViewController {
     private func setupTableView() {
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.separatorStyle = .singleLine
+        tableView.separatorStyle = .none
         tableView.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.reuseIdentifier)
         tableView.rowHeight = 75
         tableView.isScrollEnabled = false
@@ -259,7 +259,10 @@ extension CategorySelectionViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         let category = state.categories[indexPath.row]
-        cell.configure(title: category, isSelected: category == state.selectedCategory)
+        let isLast = indexPath.row == state.categories.count - 1
+        cell.configure(title: category,
+                       isSelected: category == state.selectedCategory,
+                       showsSeparator: !isLast)
         return cell
     }
 }

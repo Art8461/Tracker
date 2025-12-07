@@ -403,7 +403,7 @@ class BaseTrackerCreationViewController: UIViewController {
     
     private func updateNameLimitLabel(for state: TrackerCreationState) {
         characterLimitLabel.text = state.nameLimitText
-        characterLimitLabel.isHidden = state.isNameLengthValid
+        characterLimitLabel.isHidden = state.shouldShowNameLimitWarning == false
     }
     
     func updateButton(_ button: UIButton, subtitle: String?) {
@@ -578,6 +578,21 @@ extension BaseTrackerCreationViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
+    }
+
+    func textField(_ textField: UITextField,
+                   shouldChangeCharactersIn range: NSRange,
+                   replacementString string: String) -> Bool {
+        let currentText = textField.text ?? ""
+        guard let stringRange = Range(range, in: currentText) else { return true }
+        let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
+        let limit = viewModel.state.nameCharacterLimit
+        guard updatedText.count > limit else { return true }
+        
+        let limitedText = String(updatedText.prefix(limit))
+        textField.text = limitedText
+        viewModel.updateName(limitedText)
+        return false
     }
 }
 

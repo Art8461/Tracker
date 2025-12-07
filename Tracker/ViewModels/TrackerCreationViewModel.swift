@@ -37,7 +37,7 @@ struct TrackerCreationState {
     }
 
     var shouldShowNameLimitWarning: Bool {
-        name.count > nameCharacterLimit
+        name.count >= nameCharacterLimit
     }
     
     var isScheduleValid: Bool {
