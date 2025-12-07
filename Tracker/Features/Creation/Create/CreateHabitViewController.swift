@@ -9,6 +9,17 @@ import UIKit
 
 final class CreateHabitViewController: BaseTrackerCreationViewController {
     
+    // MARK: - Init
+    
+    override init(viewModel: TrackerCreationViewModel = TrackerCreationViewModel(type: .habit)) {
+        super.init(viewModel: viewModel)
+    }
+    
+    required init?(coder: NSCoder) {
+        assertionFailure("init(coder:) has not been implemented")
+        return nil
+    }
+    
     // MARK: - UI Elements
     
     private lazy var scheduleButton: UIButton = {
@@ -27,18 +38,13 @@ final class CreateHabitViewController: BaseTrackerCreationViewController {
         return view
     }()
     
-    // MARK: - Properties
-    
-    private var selectedSchedule: [Weekday] = [] {
-        didSet { updateScheduleSubtitle() }
-    }
-    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         titleLabel.text = "Новая привычка"
         categoryButton.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        updateScheduleSubtitle(with: viewModel.state.schedule)
     }
     
     // MARK: - Override Methods
@@ -64,18 +70,11 @@ final class CreateHabitViewController: BaseTrackerCreationViewController {
         return scheduleButton
     }
     
-    override func getSchedule() -> [Weekday] {
-        return selectedSchedule
-    }
-    
-    override func isScheduleValid() -> Bool {
-        return !selectedSchedule.isEmpty
-    }
-    
     // MARK: - Actions
     
     @objc private func scheduleTapped() {
-        let controller = ScheduleViewController(selectedWeekdays: Set(selectedSchedule))
+        let scheduleViewModel = ScheduleViewModel(selectedWeekdays: Set(viewModel.state.schedule))
+        let controller = ScheduleViewController(viewModel: scheduleViewModel)
         controller.delegate = self
         let nav = UINavigationController(rootViewController: controller)
         present(nav, animated: true)
@@ -83,19 +82,26 @@ final class CreateHabitViewController: BaseTrackerCreationViewController {
     
     // MARK: - Subtitle updates
     
-    private func updateScheduleSubtitle() {
-        guard !selectedSchedule.isEmpty else {
+    private func updateScheduleSubtitle(with schedule: [Weekday]) {
+        guard !schedule.isEmpty else {
             updateButton(scheduleButton, subtitle: nil)
             return
         }
-        if selectedSchedule.count == Weekday.allCases.count {
+        if schedule.count == Weekday.allCases.count {
             updateButton(scheduleButton, subtitle: "Каждый день")
         } else {
-            let text = selectedSchedule
+            let text = schedule
                 .sorted { $0.rawValue < $1.rawValue }
                 .map { $0.shortTitle }
                 .joined(separator: ", ")
             updateButton(scheduleButton, subtitle: text)
+        }
+    }
+    
+    override func stateDidUpdate(previous: TrackerCreationState?, current: TrackerCreationState) {
+        super.stateDidUpdate(previous: previous, current: current)
+        if previous?.schedule != current.schedule {
+            updateScheduleSubtitle(with: current.schedule)
         }
     }
 }
@@ -105,7 +111,7 @@ final class CreateHabitViewController: BaseTrackerCreationViewController {
 extension CreateHabitViewController: ScheduleViewControllerDelegate {
     func scheduleViewController(_ viewController: ScheduleViewController,
                                 didUpdate weekdays: [Weekday]) {
-        selectedSchedule = weekdays
+        viewModel.updateSchedule(weekdays)
     }
     
 }

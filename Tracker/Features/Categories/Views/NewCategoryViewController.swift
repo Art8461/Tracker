@@ -17,6 +17,8 @@ final class NewCategoryViewController: UIViewController {
     // MARK: - Properties
     
     weak var delegate: NewCategoryViewControllerDelegate?
+    private let viewModel = NewCategoryViewModel()
+    private var state = NewCategoryState(title: "")
     
     // MARK: - UI Elements
     
@@ -69,6 +71,7 @@ final class NewCategoryViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = UIColor(resource: .appWhite)
         navigationItem.title = "Новая категория"
+        bindViewModel()
         setupUI()
         setupKeyboardObservers()
     }
@@ -131,16 +134,27 @@ final class NewCategoryViewController: UIViewController {
         view.addGestureRecognizer(tap)
     }
     
+    private func bindViewModel() {
+        viewModel.onStateChange = { [weak self] state in
+            self?.apply(state: state)
+        }
+        viewModel.bind()
+    }
+    
+    private func apply(state: NewCategoryState) {
+        self.state = state
+        updateDoneButtonState(isEnabled: state.isSaveEnabled)
+    }
+    
     // MARK: - Actions
     
     @objc private func textFieldEditingChanged() {
-        updateDoneButtonState()
+        viewModel.updateTitle(nameTextField.text ?? "")
     }
     
     @objc private func doneTapped() {
-        guard let text = nameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !text.isEmpty else { return }
-        delegate?.newCategoryViewController(self, didCreate: text)
+        guard let category = viewModel.makeCategory() else { return }
+        delegate?.newCategoryViewController(self, didCreate: category)
         // Закрываем модальный контроллер
         if let navController = navigationController, navController.presentingViewController != nil {
             navController.dismiss(animated: true)
@@ -178,12 +192,9 @@ final class NewCategoryViewController: UIViewController {
         view.endEditing(true)
     }
     
-    private func updateDoneButtonState() {
-        let trimmedText = nameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let isValid = !trimmedText.isEmpty
-        
-        doneButton.isEnabled = isValid
-        doneButton.backgroundColor = isValid
+    private func updateDoneButtonState(isEnabled: Bool) {
+        doneButton.isEnabled = isEnabled
+        doneButton.backgroundColor = isEnabled
         ? UIColor(resource: .appBlack)
                   : UIColor(resource: .appGray)
     }
@@ -193,7 +204,7 @@ final class NewCategoryViewController: UIViewController {
 
 extension NewCategoryViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if doneButton.isEnabled {
+        if viewModel.state.isSaveEnabled {
             doneTapped()
         }
         return true

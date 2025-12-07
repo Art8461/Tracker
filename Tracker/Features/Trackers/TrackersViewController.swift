@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TrackersViewController: UIViewController{
+final class TrackersViewController: UIViewController{
 
     // MARK: - UI Elements
 
@@ -87,15 +87,7 @@ class TrackersViewController: UIViewController{
         return cv
     }()
 
-    private var filteredCategories: [TrackerCategory] = []
-    private var searchText: String = ""
-    private let calendar = Calendar.current
-    var currentDate: Date = Date()
-    
-    // MARK: - Core Data Stores
-    private let trackerStore = TrackerStore()
-    private let categoryStore = TrackerCategoryStore()
-    private let recordStore = TrackerRecordStore()
+    private let viewModel = TrackersViewModel()
     
     private func configureNavigationBar() {
         title = "Трекеры"
@@ -117,18 +109,8 @@ class TrackersViewController: UIViewController{
         setupKeyboardDismiss()
 
         datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
-        
-        setupStores()
-        currentDate = normalized(date: Date())
-        datePicker.date = currentDate
-        applyFilters()
-        
-    }
-    
-    private func setupStores() {
-        trackerStore.delegate = self
-        categoryStore.delegate = self
-        recordStore.delegate = self
+        bindViewModel()
+        viewModel.start()
     }
     
     private func setupKeyboardDismiss() {
@@ -140,6 +122,23 @@ class TrackersViewController: UIViewController{
     
     @objc private func dismissKeyboard() {
         view.endEditing(true)
+    }
+    
+    private func bindViewModel() {
+        viewModel.onStateChange = { [weak self] state in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.collectionView.reloadData()
+                self.updateEmptyState(hasTrackers: state.hasTrackers)
+                self.datePicker.date = self.viewModel.currentDate
+            }
+        }
+        
+        viewModel.onRecordsUpdated = { [weak self] in
+            DispatchQueue.main.async {
+                self?.collectionView.reloadData()
+            }
+        }
     }
     
     
@@ -185,132 +184,40 @@ class TrackersViewController: UIViewController{
         ])
     }
     
-    func updateEmptyState() {
-        let hasTrackers = filteredCategories.flatMap { $0.trackers }.isEmpty == false
+    private func updateEmptyState(hasTrackers: Bool) {
         emptyImageView.isHidden = hasTrackers
         emptyLabel.isHidden = hasTrackers
         collectionView.isHidden = !hasTrackers
-    }
-    
-    private func applyFilters() {
-        let selectedDate = currentDate
-        let normalizedSearch = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        guard let weekday = Weekday.from(date: selectedDate, calendar: calendar) else {
-            filteredCategories = []
-            collectionView.reloadData()
-            updateEmptyState()
-            return
-        }
-        
-        let allCategories = categoryStore.categories
-        filteredCategories = allCategories.compactMap { category in
-            let trackers = category.trackers.filter { tracker in
-                let matchesSearch = normalizedSearch.isEmpty || tracker.title.lowercased().contains(normalizedSearch)
-                let matchesSchedule = tracker.schedule.isEmpty || tracker.schedule.contains(weekday)
-                return matchesSearch && matchesSchedule
-            }
-            return trackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: trackers)
-        }
-        
-        collectionView.reloadData()
-        updateEmptyState()
     }
 
     // MARK: - Actions
     
     @objc private func addTapped() {
-        let vc = CreateTrackerTypeViewController()
+        let typeViewModel = CreateTrackerTypeViewModel(categories: viewModel.availableCategoryTitles())
+        let vc = CreateTrackerTypeViewController(viewModel: typeViewModel)
         vc.creationDelegate = self
-        vc.availableCategories = categoryStore.categories.map { $0.title }
         let nav = UINavigationController(rootViewController: vc)
         nav.modalPresentationStyle = .pageSheet
         present(nav, animated: true)
     }
     
     @objc private func dateChanged() {
-        currentDate = normalized(date: datePicker.date)
-        applyFilters()
+        viewModel.updateDate(datePicker.date)
     }
     
     // MARK: - Data
     
-    var categories: [TrackerCategory] {
-        categoryStore.categories
-    }
-
-    func complete(tracker: Tracker, on date: Date) {
-        let normalizedDate = normalized(date: date)
-        do {
-            try recordStore.addRecord(trackerId: tracker.id, date: normalizedDate)
-        } catch {
-            print("Failed to complete tracker: \(error)")
-        }
-    }
-
-    func uncomplete(tracker: Tracker, on date: Date) {
-        let normalizedDate = normalized(date: date)
-        do {
-            try recordStore.removeRecord(trackerId: tracker.id, date: normalizedDate)
-        } catch {
-            print("Failed to uncomplete tracker: \(error)")
-        }
-    }
-
-    
-    private func normalized(date: Date) -> Date {
-        return calendar.startOfDay(for: date)
-    }
-
-    private func isTrackerCompleted(_ tracker: Tracker, on date: Date) -> Bool {
-        return recordStore.isCompleted(trackerId: tracker.id, date: date)
-    }
-    
-    private func completedCount(for tracker: Tracker) -> Int {
-        return recordStore.records.filter { $0.trackerId == tracker.id }.count
-    }
-    
-    private func isFuture(date: Date) -> Bool {
-        let today = normalized(date: Date())
-        let selected = normalized(date: date)
-        return selected > today
-    }
-    
-    private func formattedDaysText(for count: Int) -> String {
-        let remainder10 = count % 10
-        let remainder100 = count % 100
-        let suffix: String
-        if remainder100 >= 11 && remainder100 <= 14 {
-            suffix = "дней"
-        } else {
-            switch remainder10 {
-            case 1:
-                suffix = "день"
-            case 2...4:
-                suffix = "дня"
-            default:
-                suffix = "дней"
-            }
-        }
-        return "\(count) \(suffix)"
-    }
-    
-    private func color(for tracker: Tracker) -> UIColor {
-        return UIColor(hex: tracker.colorHex) ?? UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
-    }
-    
-    private func configureCell(_ cell: TrackerCell, with tracker: Tracker, on date: Date) {
-        let normalizedDate = normalized(date: date)
-        let isCompleted = isTrackerCompleted(tracker, on: normalizedDate)
-        let count = completedCount(for: tracker)
-        let daysText = formattedDaysText(for: count)
-        let color = color(for: tracker)
-        let buttonEnabled = !isFuture(date: date)
-        
-        cell.configure(with: tracker,
-                       daysText: daysText,
+    private func configureCell(_ cell: TrackerCell, at indexPath: IndexPath) {
+        guard let cellViewModel = viewModel.cellViewModel(section: indexPath.section, item: indexPath.item) else { return }
+        let color = UIColor(hex: cellViewModel.colorHex) ?? UIColor(resource: .appGrayOsn100)
+        cell.configure(with: cellViewModel.tracker,
+                       daysText: cellViewModel.daysText,
                        color: color,
-                       isCompleted: isCompleted,
-                       isButtonEnabled: buttonEnabled)
+                       isCompleted: cellViewModel.isCompleted,
+                       isButtonEnabled: cellViewModel.isButtonEnabled)
+        cell.plusAction = { [weak self] in
+            self?.viewModel.toggleCompletion(for: cellViewModel.tracker)
+        }
     }
 
   }
@@ -318,11 +225,11 @@ class TrackersViewController: UIViewController{
 extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return filteredCategories.count
+        viewModel.numberOfSections()
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return filteredCategories[section].trackers.count
+        viewModel.numberOfItems(in: section)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -330,34 +237,7 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
             return UICollectionViewCell()
         }
         
-        let tracker = filteredCategories[indexPath.section].trackers[indexPath.item]
-        configureCell(cell, with: tracker, on: currentDate)
-        
-        cell.plusAction = { [weak self, weak collectionView, weak cell] in
-            guard let self = self else { return }
-            guard !self.isFuture(date: self.currentDate) else { return }
-            let targetDate = self.normalized(date: self.currentDate)
-            if self.isTrackerCompleted(tracker, on: targetDate) {
-                self.uncomplete(tracker: tracker, on: targetDate)
-            } else {
-                self.complete(tracker: tracker, on: targetDate)
-            }
-            
-            if let cell = cell {
-                self.configureCell(cell, with: tracker, on: self.currentDate)
-            }
-            
-            guard let collectionView = collectionView else {
-                self.collectionView.reloadData()
-                return
-            }
-            if indexPath.section < self.filteredCategories.count,
-               indexPath.item < self.filteredCategories[indexPath.section].trackers.count {
-                collectionView.reloadItems(at: [indexPath])
-            } else {
-                self.collectionView.reloadData()
-            }
-        }
+        configureCell(cell, at: indexPath)
         
         return cell
     }
@@ -382,22 +262,23 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
                                                                            for: indexPath) as? TrackersSectionHeader else {
             return UICollectionReusableView()
         }
-        header.configure(title: filteredCategories[indexPath.section].title)
+        if let title = viewModel.sectionTitle(for: indexPath.section) {
+            header.configure(title: title)
+        }
         return header
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForHeaderInSection section: Int) -> CGSize {
-        guard section < filteredCategories.count else { return .zero }
+        guard viewModel.sectionTitle(for: section) != nil else { return .zero }
         return CGSize(width: collectionView.bounds.width, height: 22)
     }
 }
 
 extension TrackersViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        self.searchText = searchText
-        applyFilters()
+        viewModel.updateSearch(query: searchText)
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -407,42 +288,7 @@ extension TrackersViewController: UISearchBarDelegate {
 
 extension TrackersViewController: TrackerCreationDelegate {
     func trackerCreationDidCreate(_ tracker: Tracker, in categoryTitle: String) {
-        do {
-            // Создаем категорию, если её нет
-            if !categoryStore.categories.contains(where: { $0.title == categoryTitle }) {
-                try categoryStore.createCategory(title: categoryTitle)
-            }
-            // Создаем трекер
-            try trackerStore.createTracker(tracker, in: categoryTitle)
-            applyFilters()
-        } catch {
-            print("Failed to create tracker: \(error)")
-        }
+        viewModel.createTracker(tracker, in: categoryTitle)
     }
 }
 
-// MARK: - Store Delegates
-
-extension TrackersViewController: TrackerStoreDelegate {
-    func trackerStoreDidChange(_ store: TrackerStore) {
-        DispatchQueue.main.async { [weak self] in
-            self?.applyFilters()
-        }
-    }
-}
-
-extension TrackersViewController: TrackerCategoryStoreDelegate {
-    func trackerCategoryStoreDidChange(_ store: TrackerCategoryStore) {
-        DispatchQueue.main.async { [weak self] in
-            self?.applyFilters()
-        }
-    }
-}
-
-extension TrackersViewController: TrackerRecordStoreDelegate {
-    func trackerRecordStoreDidChange(_ store: TrackerRecordStore) {
-        DispatchQueue.main.async { [weak self] in
-            self?.collectionView.reloadData()
-        }
-    }
-}

@@ -6,31 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		285E67E82ED5728D002A6FA5 /* Library.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 285E67E62ED5728D002A6FA5 /* Library.xcdatamodeld */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
-		285E67E72ED5728D002A6FA5 /* Library.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Library.xcdatamodel; sourceTree = "<group>"; };
 		286E29102EC9F2760099A8FD /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		286E29222EC9F2770099A8FD /* Exceptions for "Tracker" folder in "Tracker" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 286E290F2EC9F2760099A8FD /* Tracker */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		286E29122EC9F2760099A8FD /* Tracker */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				286E29222EC9F2770099A8FD /* Exceptions for "Tracker" folder in "Tracker" target */,
-			);
 			path = Tracker;
 			sourceTree = "<group>";
 		};
@@ -50,7 +32,6 @@
 		286E29072EC9F2760099A8FD = {
 			isa = PBXGroup;
 			children = (
-				285E67E62ED5728D002A6FA5 /* Library.xcdatamodeld */,
 				286E29122EC9F2760099A8FD /* Tracker */,
 				286E29112EC9F2760099A8FD /* Products */,
 			);
@@ -63,6 +44,7 @@
 			);
 			name = Products;
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 /* End PBXGroup section */
 
@@ -138,7 +120,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				285E67E82ED5728D002A6FA5 /* Library.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,7 +135,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 69ZJZ6FPCF;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Tracker/Info.plist;
+				INFOPLIST_FILE = Config/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
@@ -183,7 +164,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 69ZJZ6FPCF;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Tracker/Info.plist;
+				INFOPLIST_FILE = Config/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
@@ -348,19 +329,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		285E67E62ED5728D002A6FA5 /* Library.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				285E67E72ED5728D002A6FA5 /* Library.xcdatamodel */,
-			);
-			currentVersion = 285E67E72ED5728D002A6FA5 /* Library.xcdatamodel */;
-			path = Library.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = 286E29082EC9F2760099A8FD /* Project object */;
 }

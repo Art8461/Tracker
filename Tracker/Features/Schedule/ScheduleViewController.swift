@@ -18,7 +18,8 @@ final class ScheduleViewController: UIViewController {
     
     weak var delegate: ScheduleViewControllerDelegate?
     
-    private var selectedWeekdays: Set<Weekday>
+    private let viewModel: ScheduleViewModel
+    private var state: ScheduleState
     
     private let tableBackgroundColor = UIColor(resource: .appGrayOsn)
     
@@ -27,6 +28,7 @@ final class ScheduleViewController: UIViewController {
         table.translatesAutoresizingMaskIntoConstraints = false
         table.separatorStyle = .singleLine
         table.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        table.separatorColor = UIColor(resource: .appGray)
         table.backgroundColor = UIColor(resource: .appWhite)
         table.tableHeaderView = UIView(frame: .zero)
         table.tableFooterView = UIView(frame: .zero)
@@ -47,8 +49,9 @@ final class ScheduleViewController: UIViewController {
     
     // MARK: - Init
     
-    init(selectedWeekdays: Set<Weekday>) {
-        self.selectedWeekdays = selectedWeekdays
+    init(viewModel: ScheduleViewModel) {
+        self.viewModel = viewModel
+        self.state = viewModel.state
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -65,6 +68,21 @@ final class ScheduleViewController: UIViewController {
         navigationItem.title = "Расписание"
         setupDoneButton()
         setupTableView()
+        bindViewModel()
+    }
+    
+    private func bindViewModel() {
+        viewModel.onStateChange = { [weak self] state in
+            DispatchQueue.main.async {
+                self?.apply(state: state)
+            }
+        }
+        viewModel.bind()
+    }
+    
+    private func apply(state: ScheduleState) {
+        self.state = state
+        tableView.reloadData()
     }
     
     // MARK: - Setup
@@ -96,22 +114,15 @@ final class ScheduleViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func doneTapped() {
-        delegate?.scheduleViewController(self, didUpdate: sortedSelection())
+        delegate?.scheduleViewController(self, didUpdate: viewModel.selectedWeekdaysList())
         dismiss(animated: true)
     }
     
     @objc private func switchChanged(_ sender: UISwitch) {
         guard let weekday = Weekday(rawValue: sender.tag) else { return }
-        if sender.isOn {
-            selectedWeekdays.insert(weekday)
-        } else {
-            selectedWeekdays.remove(weekday)
-        }
+        viewModel.set(weekday, isSelected: sender.isOn)
     }
     
-    private func sortedSelection() -> [Weekday] {
-        return selectedWeekdays.sorted { $0.rawValue < $1.rawValue }
-    }
 }
 
 // MARK: - UITableViewDataSource
@@ -129,7 +140,7 @@ extension ScheduleViewController: UITableViewDataSource {
         cell.textLabel?.text = weekday.localizedName
         
         let toggle = UISwitch()
-        toggle.isOn = selectedWeekdays.contains(weekday)
+        toggle.isOn = state.selectedWeekdays.contains(weekday)
         toggle.tag = weekday.rawValue
         toggle.onTintColor = UIColor(resource: .appBlue)
         toggle.thumbTintColor = UIColor(resource: .appWhite)
