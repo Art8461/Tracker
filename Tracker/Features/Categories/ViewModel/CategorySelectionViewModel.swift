@@ -1,14 +1,5 @@
 import Foundation
 
-struct CategorySelectionState {
-    let categories: [String]
-    let selectedCategory: String?
-    
-    var isEmpty: Bool {
-        categories.isEmpty
-    }
-}
-
 final class CategorySelectionViewModel: NSObject {
     
     var onStateChange: ((CategorySelectionState) -> Void)?
@@ -67,7 +58,7 @@ final class CategorySelectionViewModel: NSObject {
         do {
             try store.createCategory(title: trimmed)
             reloadCategories()
-            selectCategoryIfPossible(with: trimmed)
+            selectCategoryIfPossible(with: trimmed, notifyDelegate: true)
         } catch {
             handle(error: error)
         }
@@ -81,11 +72,12 @@ final class CategorySelectionViewModel: NSObject {
         state = CategorySelectionState(categories: titles, selectedCategory: selected)
     }
     
-    private func selectCategoryIfPossible(with title: String) {
+    private func selectCategoryIfPossible(with title: String,
+                                          notifyDelegate: Bool = false) {
         guard let index = state.categories.firstIndex(where: { $0.caseInsensitiveCompare(title) == .orderedSame }) else {
             return
         }
-        selectCategory(at: index, notifyDelegate: false)
+        selectCategory(at: index, notifyDelegate: notifyDelegate)
     }
     
     private func notifySelection(with category: String) {

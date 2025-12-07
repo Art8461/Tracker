@@ -11,6 +11,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
+    // MARK: - UIWindowSceneDelegate
+
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession,
                options connectionOptions: UIScene.ConnectionOptions) {
 
@@ -32,9 +34,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.makeKeyAndVisible()
     }
     
+    // MARK: - Onboarding
+    
     private func shouldShowOnboarding() -> Bool {
         return UserDefaults.standard.bool(forKey: OnboardingPageViewController.completionKey) == false
     }
+    
+    // MARK: - Presentation
     
     private func showMainInterface(animated: Bool = true) {
         guard let window = window else { return }

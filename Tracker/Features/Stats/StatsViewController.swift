@@ -7,7 +7,7 @@
 
 import UIKit
 
-class StatsViewController: UIViewController {
+final class StatsViewController: UIViewController {
     
     private let viewModel = StatsViewModel()
     private var state = StatsState(metrics: [])

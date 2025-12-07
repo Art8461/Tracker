@@ -151,9 +151,12 @@ final class CategorySelectionViewController: UIViewController {
             
             tableView.topAnchor.constraint(equalTo: tableContainerView.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: tableContainerView.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: tableContainerView.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: tableContainerView.bottomAnchor)
+            tableView.trailingAnchor.constraint(equalTo: tableContainerView.trailingAnchor)
         ])
+        
+        let containerBottomConstraint = tableContainerView.bottomAnchor.constraint(equalTo: tableView.bottomAnchor)
+        containerBottomConstraint.priority = .defaultHigh
+        containerBottomConstraint.isActive = true
         
         tableHeightConstraint = tableView.heightAnchor.constraint(equalToConstant: 0)
         tableHeightConstraint?.isActive = true

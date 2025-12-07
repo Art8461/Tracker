@@ -136,9 +136,7 @@ final class NewCategoryViewController: UIViewController {
     
     private func bindViewModel() {
         viewModel.onStateChange = { [weak self] state in
-            DispatchQueue.main.async {
-                self?.apply(state: state)
-            }
+            self?.apply(state: state)
         }
         viewModel.bind()
     }
@@ -206,7 +204,7 @@ final class NewCategoryViewController: UIViewController {
 
 extension NewCategoryViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if state.isSaveEnabled {
+        if viewModel.state.isSaveEnabled {
             doneTapped()
         }
         return true

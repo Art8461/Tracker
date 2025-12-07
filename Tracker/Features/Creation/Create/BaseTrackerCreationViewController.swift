@@ -584,7 +584,7 @@ extension BaseTrackerCreationViewController: UITextFieldDelegate {
                    shouldChangeCharactersIn range: NSRange,
                    replacementString string: String) -> Bool {
         let currentText = textField.text ?? ""
-        guard let stringRange = Range(range, in: currentText) else { return true }
+        guard let stringRange = Range(range, in: currentText) else { return false }
         let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
         let limit = viewModel.state.nameCharacterLimit
         guard updatedText.count > limit else { return true }
