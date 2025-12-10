@@ -277,7 +277,7 @@ class BaseTrackerCreationViewController: UIViewController {
             emojiTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
             emojiTitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            emojiCollectionView.topAnchor.constraint(equalTo: emojiTitleLabel.bottomAnchor, constant: 16),
+            emojiCollectionView.topAnchor.constraint(equalTo: emojiTitleLabel.bottomAnchor, constant: 24),
             emojiCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 18),
             emojiCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -19),
             
@@ -285,10 +285,10 @@ class BaseTrackerCreationViewController: UIViewController {
             colorTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
             colorTitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            colorCollectionView.topAnchor.constraint(equalTo: colorTitleLabel.bottomAnchor, constant: 16),
+            colorCollectionView.topAnchor.constraint(equalTo: colorTitleLabel.bottomAnchor, constant: 24),
             colorCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 18),
             colorCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -19),
-            colorCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -32),
+            colorCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0),
             
             cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             cancelButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
