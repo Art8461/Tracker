@@ -33,7 +33,7 @@ final class TrackersViewController: UIViewController{
     
     private let searchBar: UISearchBar = {
         let sb = UISearchBar()
-        sb.placeholder = "Поиск"
+        sb.placeholder = NSLocalizedString("Поиск", comment: "Search bar placeholder")
         sb.searchBarStyle = .minimal
         sb.translatesAutoresizingMaskIntoConstraints = false
         
@@ -42,7 +42,7 @@ final class TrackersViewController: UIViewController{
         sb.searchTextField.backgroundColor = UIColor(resource: .appSearchBackgraund)
 
         sb.searchTextField.attributedPlaceholder = NSAttributedString(
-            string: "Поиск",
+            string: NSLocalizedString("Поиск", comment: "Search bar placeholder"),
             attributes: [
                 .foregroundColor: UIColor(resource: .appGraySearch),
                 .font: UIFont.systemFont(ofSize: 17)
@@ -65,7 +65,7 @@ final class TrackersViewController: UIViewController{
 
     private let emptyLabel: UILabel = {
         let label = UILabel()
-        label.text = "Что будем отслеживать?"
+        label.text = NSLocalizedString("Что будем отслеживать?", comment: "Empty state title")
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         label.textColor = UIColor(resource: .appBlack)
         label.textAlignment = .center
@@ -90,7 +90,7 @@ final class TrackersViewController: UIViewController{
     private let viewModel = TrackersViewModel()
     
     private func configureNavigationBar() {
-        title = "Трекеры"
+        title = NSLocalizedString("Трекеры", comment: "Trackers screen title")
         navigationItem.largeTitleDisplayMode = .always
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.leftBarButtonItem = addTrackerBarButtonItem

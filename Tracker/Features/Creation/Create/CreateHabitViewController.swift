@@ -23,7 +23,10 @@ final class CreateHabitViewController: BaseTrackerCreationViewController {
     // MARK: - UI Elements
     
     private lazy var scheduleButton: UIButton = {
-        let button = createSelectionButton(title: "Расписание", subtitle: nil)
+        let button = createSelectionButton(
+            title: NSLocalizedString("Расписание", comment: "Schedule selection button"),
+            subtitle: nil
+        )
         button.addTarget(self, action: #selector(scheduleTapped), for: .touchUpInside)
         button.backgroundColor = UIColor(resource: .appGrayOsn)
         button.layer.cornerRadius = 16
@@ -42,7 +45,7 @@ final class CreateHabitViewController: BaseTrackerCreationViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        titleLabel.text = "Новая привычка"
+        titleLabel.text = NSLocalizedString("Новая привычка", comment: "Create habit title")
         categoryButton.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         updateScheduleSubtitle(with: viewModel.state.schedule)
     }
@@ -88,7 +91,7 @@ final class CreateHabitViewController: BaseTrackerCreationViewController {
             return
         }
         if schedule.count == Weekday.allCases.count {
-            updateButton(scheduleButton, subtitle: "Каждый день")
+            updateButton(scheduleButton, subtitle: NSLocalizedString("Каждый день", comment: "Every day schedule summary"))
         } else {
             let text = schedule
                 .sorted { $0.rawValue < $1.rawValue }

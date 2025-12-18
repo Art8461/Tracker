@@ -46,7 +46,7 @@ final class CategorySelectionViewController: UIViewController {
     
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Добавить категорию", for: .normal)
+        button.setTitle(NSLocalizedString("Добавить категорию", comment: "Add category button"), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor(resource: .appWhite), for: .normal)
         button.backgroundColor = UIColor(resource: .appBlack)
@@ -72,7 +72,7 @@ final class CategorySelectionViewController: UIViewController {
     
     private let emptyStateLabel: UILabel = {
         let label = UILabel()
-        label.text = "Привычки и события можно\nобъединить по смыслу"
+        label.text = NSLocalizedString("Привычки и события можно\nобъединить по смыслу", comment: "Empty categories text")
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textColor = UIColor(resource: .appBlack)
         label.textAlignment = .center
@@ -99,7 +99,7 @@ final class CategorySelectionViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(resource: .appWhite)
-        navigationItem.title = "Категория"
+        navigationItem.title = NSLocalizedString("Категория", comment: "Category selection title")
         setupEmptyState()
         setupDoneButton()
         setupTableView()
@@ -204,7 +204,7 @@ final class CategorySelectionViewController: UIViewController {
         tableView.isHidden = !hasCategories
         
         // Кнопка "Добавить категорию" всегда активна
-        doneButton.setTitle("Добавить категорию", for: .normal)
+        doneButton.setTitle(NSLocalizedString("Добавить категорию", comment: "Add category button"), for: .normal)
         doneButton.isEnabled = true
         doneButton.alpha = 1.0
         doneButton.backgroundColor = UIColor(resource: .appBlack)
@@ -229,8 +229,12 @@ final class CategorySelectionViewController: UIViewController {
     }
     
     private func presentError(_ message: String) {
-        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        let alert = UIAlertController(
+            title: NSLocalizedString("Ошибка", comment: "Category error title"),
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Alert OK"), style: .default))
         present(alert, animated: true)
     }
     

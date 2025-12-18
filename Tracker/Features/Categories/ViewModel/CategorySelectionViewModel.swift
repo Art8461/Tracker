@@ -92,14 +92,14 @@ final class CategorySelectionViewModel: NSObject {
         if let storeError = error as? TrackerCategoryStoreError {
             switch storeError {
             case .duplicateTitle:
-                message = "Такая категория уже существует."
+                message = NSLocalizedString("Такая категория уже существует.", comment: "Category duplicate error")
             case .invalidTitle:
-                message = "Введите корректное название категории."
+                message = NSLocalizedString("Введите корректное название категории.", comment: "Category invalid title error")
             case .categoryNotFound:
-                message = "Категория не найдена."
+                message = NSLocalizedString("Категория не найдена.", comment: "Category not found error")
             }
         } else {
-            message = "Не удалось сохранить категорию. Попробуйте ещё раз."
+            message = NSLocalizedString("Не удалось сохранить категорию. Попробуйте ещё раз.", comment: "Category generic save error")
         }
         DispatchQueue.main.async {
             self.onError?(message)

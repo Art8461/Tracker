@@ -18,11 +18,11 @@ class MainTabBarController: UITabBarController {
         let staticksVC = StatsViewController()
 
         // Настройка Tab Bar Item с кастомными картинками
-        trackersVC.tabBarItem = UITabBarItem(title: "Трекеры",
+        trackersVC.tabBarItem = UITabBarItem(title: NSLocalizedString("Трекеры", comment: "Tab title trackers"),
                                              image: UIImage(named: "TabTrack"),
                                              selectedImage: UIImage(named: "TabTrack"))
         
-        staticksVC.tabBarItem = UITabBarItem(title: "Статистика",
+        staticksVC.tabBarItem = UITabBarItem(title: NSLocalizedString("Статистика", comment: "Tab title stats"),
                                           image: UIImage(named: "TabStat"),
                                           selectedImage: UIImage(named: "TabStat"))
 

@@ -169,15 +169,15 @@ final class TrackersViewModel: NSObject {
         let remainder100 = count % 100
         let suffix: String
         if remainder100 >= 11 && remainder100 <= 14 {
-            suffix = "дней"
+            suffix = NSLocalizedString("дней", comment: "Days plural genitive")
         } else {
             switch remainder10 {
             case 1:
-                suffix = "день"
+                suffix = NSLocalizedString("день", comment: "Day singular")
             case 2...4:
-                suffix = "дня"
+                suffix = NSLocalizedString("дня", comment: "Days plural")
             default:
-                suffix = "дней"
+                suffix = NSLocalizedString("дней", comment: "Days plural genitive")
             }
         }
         return "\(count) \(suffix)"
