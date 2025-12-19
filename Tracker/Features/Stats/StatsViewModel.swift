@@ -55,7 +55,7 @@ final class StatsViewModel: TrackerRecordStoreDelegate {
             StatsMetric(title: NSLocalizedString("Лучший период", comment: "Stats best period"), value: "\(bestPeriod)"),
             StatsMetric(title: NSLocalizedString("Идеальные дни", comment: "Stats perfect days"), value: "\(perfectDays)"),
             StatsMetric(title: NSLocalizedString("Трекеров завершено", comment: "Stats trackers completed"), value: "\(uniqueTrackers)"),
-            StatsMetric(title: NSLocalizedString("Среднее значение", comment: "Stats average"), value: String(format: "%.1f", average))
+            StatsMetric(title: NSLocalizedString("Среднее значение", comment: "Stats average"), value: String(format: "%.0f", average))
         ]
         
         state = StatsState(metrics: metrics)
