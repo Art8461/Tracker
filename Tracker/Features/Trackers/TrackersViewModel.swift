@@ -193,49 +193,57 @@ final class TrackersViewModel: NSObject {
         let normalizedSearch = searchQuery.lowercased()
         let categories = categoryStore.categories
         
+        let matchesTracker: (Tracker) -> Bool = { tracker in
+            let matchesSearch = normalizedSearch.isEmpty
+            || tracker.title.lowercased().contains(normalizedSearch)
+            let matchesSchedule = tracker.schedule.isEmpty || tracker.schedule.contains(weekday)
+            
+            guard matchesSearch && matchesSchedule else { return false }
+            
+            switch self.selectedFilter {
+            case .all, .today:
+                return true
+            case .completed:
+                return self.recordStore.isCompleted(trackerId: tracker.id, date: normalizedDate)
+            case .uncompleted:
+                return self.recordStore.isCompleted(trackerId: tracker.id, date: normalizedDate) == false
+            }
+        }
+        
         let hasAnyTrackersForDate = categories.contains { category in
             category.trackers.contains { tracker in
                 tracker.schedule.isEmpty || tracker.schedule.contains(weekday)
             }
         }
         
-        let sections = categories.compactMap { category -> Section? in
+        let pinnedTrackers = categories
+            .flatMap { $0.trackers }
+            .filter { $0.isPinned && matchesTracker($0) }
+            .sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+        let pinnedSection: Section? = pinnedTrackers.isEmpty
+        ? nil
+        : Section(title: NSLocalizedString("Закрепленные", comment: "Pinned trackers category title"),
+                  trackers: pinnedTrackers)
+        
+        let regularSections = categories.compactMap { category -> Section? in
             let trackers = category.trackers.filter { tracker in
-                let matchesSearch = normalizedSearch.isEmpty
-                || tracker.title.lowercased().contains(normalizedSearch)
-                let matchesSchedule = tracker.schedule.isEmpty || tracker.schedule.contains(weekday)
-                
-                guard matchesSearch && matchesSchedule else { return false }
-                
-                switch selectedFilter {
-                case .all, .today:
-                    return true
-                case .completed:
-                    return recordStore.isCompleted(trackerId: tracker.id, date: normalizedDate)
-                case .uncompleted:
-                    return recordStore.isCompleted(trackerId: tracker.id, date: normalizedDate) == false
-                }
+                matchesTracker(tracker) && tracker.isPinned == false
             }
             guard trackers.isEmpty == false else { return nil }
-            let sortedTrackers = trackers.sorted { lhs, rhs in
-                if lhs.isPinned != rhs.isPinned {
-                    return lhs.isPinned && rhs.isPinned == false
-                }
-                return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+            let sortedTrackers = trackers.sorted {
+                $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
             }
             return Section(title: category.title, trackers: sortedTrackers)
         }
+        .sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
         
-        let sortedSections = sections.sorted { lhs, rhs in
-            let lhsPinned = lhs.trackers.contains(where: { $0.isPinned })
-            let rhsPinned = rhs.trackers.contains(where: { $0.isPinned })
-            if lhsPinned != rhsPinned {
-                return lhsPinned && rhsPinned == false
-            }
-            return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+        var assembledSections: [Section] = []
+        if let pinnedSection {
+            assembledSections.append(pinnedSection)
         }
+        assembledSections.append(contentsOf: regularSections)
         
-        let hasTrackers = sortedSections.flatMap { $0.trackers }.isEmpty == false
+        let hasTrackers = assembledSections.flatMap { $0.trackers }.isEmpty == false
         let emptyReason: TrackersViewState.EmptyReason
         if hasTrackers {
             emptyReason = .none
@@ -244,7 +252,7 @@ final class TrackersViewModel: NSObject {
         }
         
         state = TrackersViewState(
-            sections: sortedSections,
+            sections: assembledSections,
             hasTrackers: hasTrackers,
             hasAnyTrackersForDate: hasAnyTrackersForDate,
             filter: selectedFilter,
