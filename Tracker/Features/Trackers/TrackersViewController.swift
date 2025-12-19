@@ -101,6 +101,7 @@ final class TrackersViewController: UIViewController{
     }()
 
     private let viewModel = TrackersViewModel()
+    private let analyticsService = AnalyticsService()
     private let filterButtonHeight: CGFloat = 50
     
     private func configureNavigationBar() {
@@ -126,6 +127,16 @@ final class TrackersViewController: UIViewController{
         bindViewModel()
         viewModel.start()
         updateCollectionInsets(isFilterHidden: false)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        reportMainEvent(event: "open")
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        reportMainEvent(event: "close")
     }
     
     private func setupKeyboardDismiss() {
@@ -227,6 +238,7 @@ final class TrackersViewController: UIViewController{
     // MARK: - Actions
     
     @objc private func addTapped() {
+        reportMainEvent(event: "click", item: "add_track")
         let typeViewModel = CreateTrackerTypeViewModel(categories: viewModel.availableCategoryTitles())
         let vc = CreateTrackerTypeViewController(viewModel: typeViewModel)
         vc.creationDelegate = self
@@ -240,6 +252,7 @@ final class TrackersViewController: UIViewController{
     }
     
     @objc private func filterTapped() {
+        reportMainEvent(event: "click", item: "filter")
         let vc = FiltersViewController(selectedFilter: viewModel.selectedFilter)
         vc.onSelectFilter = { [weak self] filter in
             self?.viewModel.selectFilter(filter)
@@ -273,7 +286,9 @@ final class TrackersViewController: UIViewController{
                        isCompleted: cellViewModel.isCompleted,
                        isButtonEnabled: cellViewModel.isButtonEnabled)
         cell.plusAction = { [weak self] in
-            self?.viewModel.toggleCompletion(for: cellViewModel.tracker)
+            guard let self else { return }
+            self.reportMainEvent(event: "click", item: "track")
+            self.viewModel.toggleCompletion(for: cellViewModel.tracker)
         }
     }
     
@@ -413,6 +428,7 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
             let editAction = UIAction(
                 title: NSLocalizedString("Редактировать", comment: "Edit tracker action")
             ) { _ in
+                self?.reportMainEvent(event: "click", item: "edit")
                 self?.presentEdit(for: tracker)
             }
             
@@ -420,6 +436,7 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
                 title: NSLocalizedString("Удалить", comment: "Delete tracker action"),
                 attributes: .destructive
             ) { [weak self] _ in
+                self?.reportMainEvent(event: "click", item: "delete")
                 self?.presentDeleteConfirmation(for: tracker, at: indexPath)
             }
             
@@ -451,6 +468,20 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
 }
 
 extension TrackersViewController: UISearchBarDelegate {
+    private func reportMainEvent(event: String, item: String? = nil) {
+        var params: [String: Any] = [
+            "event": event,
+            "screen": "Main"
+        ]
+        
+        if let item {
+            params["item"] = item
+        }
+        
+        analyticsService.report(event: "main_screen_event", params: params)
+        print("Analytics event:", params)
+    }
+    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         viewModel.updateSearch(query: searchText)
     }
