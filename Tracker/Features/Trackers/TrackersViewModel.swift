@@ -1,8 +1,21 @@
 import Foundation
 
 struct TrackersViewState {
+    enum EmptyReason {
+        case none
+        case noTrackersForDate
+        case noResults
+    }
+    
     let sections: [TrackersViewModel.Section]
     let hasTrackers: Bool
+    let hasAnyTrackersForDate: Bool
+    let filter: TrackersFilter
+    let emptyReason: EmptyReason
+    
+    var isFilterActive: Bool {
+        filter.isActive
+    }
 }
 
 final class TrackersViewModel: NSObject {
@@ -30,6 +43,7 @@ final class TrackersViewModel: NSObject {
     
     private var searchQuery: String = ""
     private(set) var currentDate: Date
+    private(set) var selectedFilter: TrackersFilter = .all
     
     private(set) var state: TrackersViewState {
         didSet {
@@ -46,7 +60,13 @@ final class TrackersViewModel: NSObject {
         self.recordStore = recordStore
         self.calendar = calendar
         self.currentDate = calendar.startOfDay(for: Date())
-        self.state = TrackersViewState(sections: [], hasTrackers: false)
+        self.state = TrackersViewState(
+            sections: [],
+            hasTrackers: false,
+            hasAnyTrackersForDate: false,
+            filter: .all,
+            emptyReason: .noTrackersForDate
+        )
         super.init()
         self.trackerStore.delegate = self
         self.categoryStore.delegate = self
@@ -65,6 +85,14 @@ final class TrackersViewModel: NSObject {
     
     func updateDate(_ date: Date) {
         currentDate = normalized(date: date)
+        applyFilters()
+    }
+    
+    func selectFilter(_ filter: TrackersFilter) {
+        selectedFilter = filter
+        if filter == .today {
+            currentDate = normalized(date: Date())
+        }
         applyFilters()
     }
     
@@ -135,25 +163,62 @@ final class TrackersViewModel: NSObject {
     
     private func applyFilters() {
         guard let weekday = Weekday.from(date: currentDate, calendar: calendar) else {
-            state = TrackersViewState(sections: [], hasTrackers: false)
+            state = TrackersViewState(
+                sections: [],
+                hasTrackers: false,
+                hasAnyTrackersForDate: false,
+                filter: selectedFilter,
+                emptyReason: .noTrackersForDate
+            )
             return
         }
         
+        let normalizedDate = normalized(date: currentDate)
         let normalizedSearch = searchQuery.lowercased()
         let categories = categoryStore.categories
+        
+        let hasAnyTrackersForDate = categories.contains { category in
+            category.trackers.contains { tracker in
+                tracker.schedule.isEmpty || tracker.schedule.contains(weekday)
+            }
+        }
         
         let sections = categories.compactMap { category -> Section? in
             let trackers = category.trackers.filter { tracker in
                 let matchesSearch = normalizedSearch.isEmpty
                 || tracker.title.lowercased().contains(normalizedSearch)
                 let matchesSchedule = tracker.schedule.isEmpty || tracker.schedule.contains(weekday)
-                return matchesSearch && matchesSchedule
+                
+                guard matchesSearch && matchesSchedule else { return false }
+                
+                switch selectedFilter {
+                case .all, .today:
+                    return true
+                case .completed:
+                    return recordStore.isCompleted(trackerId: tracker.id, date: normalizedDate)
+                case .uncompleted:
+                    return recordStore.isCompleted(trackerId: tracker.id, date: normalizedDate) == false
+                }
             }
             guard trackers.isEmpty == false else { return nil }
             return Section(title: category.title, trackers: trackers)
         }
         
-        state = TrackersViewState(sections: sections, hasTrackers: sections.flatMap { $0.trackers }.isEmpty == false)
+        let hasTrackers = sections.flatMap { $0.trackers }.isEmpty == false
+        let emptyReason: TrackersViewState.EmptyReason
+        if hasTrackers {
+            emptyReason = .none
+        } else {
+            emptyReason = hasAnyTrackersForDate ? .noResults : .noTrackersForDate
+        }
+        
+        state = TrackersViewState(
+            sections: sections,
+            hasTrackers: hasTrackers,
+            hasAnyTrackersForDate: hasAnyTrackersForDate,
+            filter: selectedFilter,
+            emptyReason: emptyReason
+        )
     }
     
     private func normalized(date: Date) -> Date {
@@ -205,6 +270,7 @@ extension TrackersViewModel: TrackerCategoryStoreDelegate {
 
 extension TrackersViewModel: TrackerRecordStoreDelegate {
     func trackerRecordStoreDidChange(_ store: TrackerRecordStore) {
+        applyFilters()
         onRecordsUpdated?()
     }
 }

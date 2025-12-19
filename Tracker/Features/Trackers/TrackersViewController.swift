@@ -84,10 +84,24 @@ final class TrackersViewController: UIViewController{
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.backgroundColor = .clear
         cv.translatesAutoresizingMaskIntoConstraints = false
+        cv.alwaysBounceVertical = true
         return cv
+    }()
+    
+    private lazy var filterButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle(NSLocalizedString("Фильтры", comment: "Filters button title"), for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = UIColor(resource: .appBlue)
+        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+        button.layer.cornerRadius = 16
+        button.addTarget(self, action: #selector(filterTapped), for: .touchUpInside)
+        return button
     }()
 
     private let viewModel = TrackersViewModel()
+    private let filterButtonHeight: CGFloat = 50
     
     private func configureNavigationBar() {
         title = NSLocalizedString("Трекеры", comment: "Trackers screen title")
@@ -111,10 +125,10 @@ final class TrackersViewController: UIViewController{
         datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
         bindViewModel()
         viewModel.start()
+        updateCollectionInsets(isFilterHidden: false)
     }
     
     private func setupKeyboardDismiss() {
-        // Скрываем клавиатуру при тапе на view
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
@@ -129,8 +143,9 @@ final class TrackersViewController: UIViewController{
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.collectionView.reloadData()
-                self.updateEmptyState(hasTrackers: state.hasTrackers)
+                self.updateEmptyState(state: state)
                 self.datePicker.date = self.viewModel.currentDate
+                self.updateFilterButton(state: state)
             }
         }
         
@@ -156,6 +171,7 @@ final class TrackersViewController: UIViewController{
         
         view.addSubview(emptyImageView)
         view.addSubview(emptyLabel)
+        view.addSubview(filterButton)
         
         NSLayoutConstraint.activate([
             emptyImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -182,12 +198,30 @@ final class TrackersViewController: UIViewController{
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        
+        NSLayoutConstraint.activate([
+            filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            filterButton.widthAnchor.constraint(equalToConstant: 114),
+            filterButton.heightAnchor.constraint(equalToConstant: filterButtonHeight)
+        ])
     }
     
-    private func updateEmptyState(hasTrackers: Bool) {
-        emptyImageView.isHidden = hasTrackers
-        emptyLabel.isHidden = hasTrackers
-        collectionView.isHidden = !hasTrackers
+    private func updateEmptyState(state: TrackersViewState) {
+        emptyImageView.isHidden = state.hasTrackers
+        emptyLabel.isHidden = state.hasTrackers
+        collectionView.isHidden = !state.hasTrackers
+        
+        switch state.emptyReason {
+        case .noTrackersForDate:
+            emptyImageView.image = UIImage(resource: .star)
+            emptyLabel.text = NSLocalizedString("Что будем отслеживать?", comment: "Empty state title")
+        case .noResults:
+            emptyImageView.image = UIImage(resource: .look)
+            emptyLabel.text = NSLocalizedString("Ничего не найдено", comment: "Empty search or filter result")
+        case .none:
+            break
+        }
     }
 
     // MARK: - Actions
@@ -203,6 +237,29 @@ final class TrackersViewController: UIViewController{
     
     @objc private func dateChanged() {
         viewModel.updateDate(datePicker.date)
+    }
+    
+    @objc private func filterTapped() {
+        let vc = FiltersViewController(selectedFilter: viewModel.selectedFilter)
+        vc.onSelectFilter = { [weak self] filter in
+            self?.viewModel.selectFilter(filter)
+        }
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .pageSheet
+        present(nav, animated: true)
+    }
+    
+    private func updateFilterButton(state: TrackersViewState) {
+        filterButton.isHidden = state.hasAnyTrackersForDate == false
+        let titleColor: UIColor = state.isFilterActive ? .cyan : .white
+        filterButton.setTitleColor(titleColor, for: .normal)
+        updateCollectionInsets(isFilterHidden: filterButton.isHidden)
+    }
+    
+    private func updateCollectionInsets(isFilterHidden: Bool) {
+        let bottomInset = isFilterHidden ? 16 : (filterButtonHeight + 24)
+        collectionView.contentInset.bottom = bottomInset
+        collectionView.verticalScrollIndicatorInsets.bottom = bottomInset
     }
     
     // MARK: - Data

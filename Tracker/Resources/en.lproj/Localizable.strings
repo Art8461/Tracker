@@ -13,6 +13,14 @@
 //TrackersViewController
 "Поиск" = "Search";
 "Что будем отслеживать?" = "What are we going to track?";
+"Ничего не найдено" = "Nothing found";
+"Фильтры" = "Filters";
+
+//TrackersFilter
+"Все трекеры" = "All trackers";
+"Трекеры на сегодня" = "Trackers today";
+"Завершённые" = "Completed";
+"Незавершённые" = "Uncompleted";
 
 //CreateTrackerTypeViewController
 "Создание трекера" = "Create tracker";
