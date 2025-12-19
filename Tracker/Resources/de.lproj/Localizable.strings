@@ -88,6 +88,7 @@
 "Такая категория уже существует." = "Eine solche Kategorie existiert bereits.";
 "Введите корректное название категории." = "Geben Sie einen gültigen Kategorienamen ein.";
 "Категория не найдена." = "Kategorie nicht gefunden.";
+"Сначала перенесите трекеры из этой категории." = "Verschieben Sie zuerst die Tracker aus dieser Kategorie.";
 "Не удалось сохранить категорию. Попробуйте ещё раз." = "Kategorie konnte nicht gespeichert werden. Versuchen Sie es erneut.";
 
 //TrackersViewModel

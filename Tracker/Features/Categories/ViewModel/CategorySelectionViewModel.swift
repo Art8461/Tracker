@@ -120,6 +120,8 @@ final class CategorySelectionViewModel: NSObject {
                 message = NSLocalizedString("Введите корректное название категории.", comment: "Category invalid title error")
             case .categoryNotFound:
                 message = NSLocalizedString("Категория не найдена.", comment: "Category not found error")
+            case .categoryNotEmpty:
+                message = NSLocalizedString("Сначала перенесите трекеры из этой категории.", comment: "Category not empty error")
             }
         } else {
             message = NSLocalizedString("Не удалось сохранить категорию. Попробуйте ещё раз.", comment: "Category generic save error")

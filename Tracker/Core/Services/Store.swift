@@ -268,6 +268,7 @@ enum TrackerCategoryStoreError: Error {
     case duplicateTitle
     case categoryNotFound
     case invalidTitle
+    case categoryNotEmpty
 }
 
 final class TrackerCategoryStore: CoreDataStore<TrackerCategoryEntity> {
@@ -342,6 +343,10 @@ final class TrackerCategoryStore: CoreDataStore<TrackerCategoryEntity> {
         try context.performAndWait {
             guard let entity = try fetchCategoryEntity(title: title) else {
                 throw TrackerCategoryStoreError.categoryNotFound
+            }
+            let trackersCount = (entity.trackers as? Set<TrackerEntity>)?.count ?? 0
+            if trackersCount > 0 {
+                throw TrackerCategoryStoreError.categoryNotEmpty
             }
             context.delete(entity)
             try saveContextIfNeeded()
