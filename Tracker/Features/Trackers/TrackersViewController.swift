@@ -376,7 +376,7 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
             return nil
         }
         
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
+        return UIContextMenuConfiguration(identifier: indexPath as NSIndexPath, previewProvider: nil) { [weak self] _ in
             let pinTitleKey = tracker.isPinned ? "Открепить" : "Закрепить"
             let pinAction = UIAction(
                 title: NSLocalizedString(pinTitleKey, comment: "Pin tracker action")
@@ -399,6 +399,28 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
             
             return UIMenu(children: [pinAction, editAction, deleteAction])
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+        guard
+            let indexPath = configuration.identifier as? IndexPath,
+            let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell
+        else {
+            return nil
+        }
+        return UITargetedPreview(view: cell.contextPreviewTargetView)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+        guard
+            let indexPath = configuration.identifier as? IndexPath,
+            let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell
+        else {
+            return nil
+        }
+        return UITargetedPreview(view: cell.contextPreviewTargetView)
     }
 }
 

@@ -10,6 +10,9 @@ import UIKit
 final class TrackerCell: UICollectionViewCell {
     static let identifier = "TrackerCell"
     
+    /// View to use for context menu highlight/preview (color block only)
+    var contextPreviewTargetView: UIView { colorView }
+    
     // MARK: - UI
     
     private let containerView: UIView = {
