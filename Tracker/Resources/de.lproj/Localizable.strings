@@ -15,6 +15,12 @@
 "Что будем отслеживать?" = "Was werden wir verfolgen?";
 "Ничего не найдено" = "Nichts gefunden";
 "Фильтры" = "Filter";
+"Закрепить" = "Anheften";
+"Открепить" = "Lösen";
+"Редактировать" = "Bearbeiten";
+"Удалить" = "Löschen";
+"Уверены что хотите удалить трекер?" = "Sind Sie sicher, dass Sie den Tracker löschen möchten?";
+"Отмена" = "Abbrechen";
 
 //TrackersFilter
 "Все трекеры" = "Alle Tracker";

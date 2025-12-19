@@ -161,6 +161,22 @@ final class TrackersViewModel: NSObject {
         }
     }
     
+    func togglePin(for tracker: Tracker) {
+        do {
+            try trackerStore.updatePinStatus(trackerId: tracker.id, isPinned: tracker.isPinned == false)
+        } catch {
+            assertionFailure("Failed to update pin status: \(error)")
+        }
+    }
+    
+    func deleteTracker(_ tracker: Tracker) {
+        do {
+            try trackerStore.deleteTracker(with: tracker.id)
+        } catch {
+            assertionFailure("Failed to delete tracker: \(error)")
+        }
+    }
+    
     private func applyFilters() {
         guard let weekday = Weekday.from(date: currentDate, calendar: calendar) else {
             state = TrackersViewState(
@@ -201,10 +217,25 @@ final class TrackersViewModel: NSObject {
                 }
             }
             guard trackers.isEmpty == false else { return nil }
-            return Section(title: category.title, trackers: trackers)
+            let sortedTrackers = trackers.sorted { lhs, rhs in
+                if lhs.isPinned != rhs.isPinned {
+                    return lhs.isPinned && rhs.isPinned == false
+                }
+                return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+            }
+            return Section(title: category.title, trackers: sortedTrackers)
         }
         
-        let hasTrackers = sections.flatMap { $0.trackers }.isEmpty == false
+        let sortedSections = sections.sorted { lhs, rhs in
+            let lhsPinned = lhs.trackers.contains(where: { $0.isPinned })
+            let rhsPinned = rhs.trackers.contains(where: { $0.isPinned })
+            if lhsPinned != rhsPinned {
+                return lhsPinned && rhsPinned == false
+            }
+            return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+        }
+        
+        let hasTrackers = sortedSections.flatMap { $0.trackers }.isEmpty == false
         let emptyReason: TrackersViewState.EmptyReason
         if hasTrackers {
             emptyReason = .none
@@ -213,7 +244,7 @@ final class TrackersViewModel: NSObject {
         }
         
         state = TrackersViewState(
-            sections: sections,
+            sections: sortedSections,
             hasTrackers: hasTrackers,
             hasAnyTrackersForDate: hasAnyTrackersForDate,
             filter: selectedFilter,

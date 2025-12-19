@@ -40,7 +40,7 @@ final class TrackerCell: UICollectionViewCell {
     private let emojiBackground: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        let baseColor = UIColor(named: "AppWhite") ?? UIColor.white
+        let baseColor = UIColor(resource: .appWhite)
         view.backgroundColor = baseColor.withAlphaComponent(0.3)
         view.layer.cornerRadius = 12
         view.layer.masksToBounds = true

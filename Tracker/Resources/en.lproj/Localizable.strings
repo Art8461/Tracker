@@ -14,7 +14,14 @@
 "Поиск" = "Search";
 "Что будем отслеживать?" = "What are we going to track?";
 "Ничего не найдено" = "Nothing found";
+
 "Фильтры" = "Filters";
+"Закрепить" = "Pin";
+"Открепить" = "Unpin";
+"Редактировать" = "Edit";
+"Удалить" = "Delete";
+"Уверены что хотите удалить трекер?" = "Are you sure you want to delete the tracker?";
+"Отмена" = "Cancel";
 
 //TrackersFilter
 "Все трекеры" = "All trackers";

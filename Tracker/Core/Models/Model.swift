@@ -16,6 +16,21 @@ struct Tracker {
     let colorHex: String
     let emoji: String
     let schedule: [Weekday]
+    let isPinned: Bool
+    
+    init(id: UUID,
+         title: String,
+         colorHex: String,
+         emoji: String,
+         schedule: [Weekday],
+         isPinned: Bool = false) {
+        self.id = id
+        self.title = title
+        self.colorHex = colorHex
+        self.emoji = emoji
+        self.schedule = schedule
+        self.isPinned = isPinned
+    }
 }
 
 // MARK: - Weekday

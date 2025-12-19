@@ -15,6 +15,10 @@ final class DataBaseStore {
     
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "Library")
+        if let description = container.persistentStoreDescriptions.first {
+            description.shouldMigrateStoreAutomatically = true
+            description.shouldInferMappingModelAutomatically = true
+        }
         container.loadPersistentStores { _, error in
             if let error = error as NSError? {
                 assertionFailure("Unresolved error \(error), \(error.userInfo)")
@@ -163,6 +167,7 @@ final class TrackerStore: CoreDataStore<TrackerEntity> {
             entity.type = Int16(tracker.schedule.isEmpty ? 1 : 0)
             entity.createdAt = Date()
             entity.updatedAt = Date()
+            entity.isPinned = tracker.isPinned
             entity.category = category
             
             for weekday in tracker.schedule {
@@ -181,6 +186,17 @@ final class TrackerStore: CoreDataStore<TrackerEntity> {
                 throw TrackerStoreError.trackerNotFound
             }
             context.delete(tracker)
+            try saveContextIfNeeded()
+        }
+    }
+    
+    func updatePinStatus(trackerId: UUID, isPinned: Bool) throws {
+        try context.performAndWait {
+            guard let tracker = try fetchTrackerEntity(id: trackerId) else {
+                throw TrackerStoreError.trackerNotFound
+            }
+            tracker.isPinned = isPinned
+            tracker.updatedAt = Date()
             try saveContextIfNeeded()
         }
     }
@@ -398,6 +414,7 @@ private extension TrackerEntity {
               let colorHex = colorHex else {
             return nil
         }
+        let isPinned = isPinned
         
         let items = (scheduleItems?.allObjects as? [TrackerScheduleItemEntity]) ?? []
         let weekdays = items.compactMap { (item: TrackerScheduleItemEntity) -> Weekday? in
@@ -410,7 +427,8 @@ private extension TrackerEntity {
             title: title,
             colorHex: colorHex,
             emoji: emoji,
-            schedule: weekdays
+            schedule: weekdays,
+            isPinned: isPinned
         )
     }
 }

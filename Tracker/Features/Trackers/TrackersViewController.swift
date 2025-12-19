@@ -276,6 +276,43 @@ final class TrackersViewController: UIViewController{
             self?.viewModel.toggleCompletion(for: cellViewModel.tracker)
         }
     }
+    
+    private func presentDeleteConfirmation(for tracker: Tracker, at indexPath: IndexPath) {
+        let alert = UIAlertController(
+            title: nil,
+            message: NSLocalizedString("Уверены что хотите удалить трекер?", comment: "Delete tracker confirmation"),
+            preferredStyle: .actionSheet
+        )
+        let deleteAction = UIAlertAction(
+            title: NSLocalizedString("Удалить", comment: "Delete tracker"),
+            style: .destructive
+        ) { [weak self] _ in
+            self?.viewModel.deleteTracker(tracker)
+        }
+        let cancelAction = UIAlertAction(
+            title: NSLocalizedString("Отмена", comment: "Cancel action"),
+            style: .cancel
+        )
+        
+        alert.addAction(deleteAction)
+        alert.addAction(cancelAction)
+        
+        if let popover = alert.popoverPresentationController,
+           let cell = collectionView.cellForItem(at: indexPath) {
+            popover.sourceView = cell
+            popover.sourceRect = cell.bounds
+        } else if let popover = alert.popoverPresentationController {
+            popover.sourceView = view
+            popover.sourceRect = CGRect(
+                x: view.bounds.midX,
+                y: view.bounds.midY,
+                width: 1,
+                height: 1
+            )
+        }
+        
+        present(alert, animated: true)
+    }
 
   }
 
@@ -330,6 +367,38 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
                         referenceSizeForHeaderInSection section: Int) -> CGSize {
         guard viewModel.sectionTitle(for: section) != nil else { return .zero }
         return CGSize(width: collectionView.bounds.width, height: 22)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        contextMenuConfigurationForItemAt indexPath: IndexPath,
+                        point: CGPoint) -> UIContextMenuConfiguration? {
+        guard let tracker = viewModel.tracker(section: indexPath.section, item: indexPath.item) else {
+            return nil
+        }
+        
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
+            let pinTitleKey = tracker.isPinned ? "Открепить" : "Закрепить"
+            let pinAction = UIAction(
+                title: NSLocalizedString(pinTitleKey, comment: "Pin tracker action")
+            ) { _ in
+                self?.viewModel.togglePin(for: tracker)
+            }
+            
+            let editAction = UIAction(
+                title: NSLocalizedString("Редактировать", comment: "Edit tracker action")
+            ) { _ in
+                // Placeholder for future edit implementation
+            }
+            
+            let deleteAction = UIAction(
+                title: NSLocalizedString("Удалить", comment: "Delete tracker action"),
+                attributes: .destructive
+            ) { [weak self] _ in
+                self?.presentDeleteConfirmation(for: tracker, at: indexPath)
+            }
+            
+            return UIMenu(children: [pinAction, editAction, deleteAction])
+        }
     }
 }
 
