@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class CreateIrregularViewController: BaseTrackerCreationViewController {
+class CreateIrregularViewController: BaseTrackerCreationViewController {
     
     // MARK: - Init
     

@@ -222,6 +222,16 @@ class BaseTrackerCreationViewController: UIViewController {
         return categoryButton
     }
     
+    /// Элемент, от которого отталкивается поле имени
+    func nameTopAnchorView() -> UIView {
+        return titleLabel
+    }
+    
+    /// Отступ от элемента nameTopAnchorView до поля имени
+    func getNameTopSpacing() -> CGFloat {
+        return 38
+    }
+    
     /// Метод для получения отступа сверху для emojiTitleLabel
     func getEmojiTitleTopSpacing() -> CGFloat {
         return 32
@@ -269,7 +279,8 @@ class BaseTrackerCreationViewController: UIViewController {
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 27),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
-            nameContainer.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
+            nameContainer.topAnchor.constraint(equalTo: nameTopAnchorView().bottomAnchor,
+                                               constant: getNameTopSpacing()),
             nameContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             nameContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             nameTextField.heightAnchor.constraint(equalToConstant: 75),

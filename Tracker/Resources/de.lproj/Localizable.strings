@@ -14,6 +14,7 @@
 "Поиск" = "Suchen";
 "Что будем отслеживать?" = "Was werden wir verfolgen?";
 "Ничего не найдено" = "Nichts gefunden";
+
 "Фильтры" = "Filter";
 "Закрепить" = "Anheften";
 "Открепить" = "Lösen";
@@ -56,8 +57,11 @@
 
 //CreateIrregularViewController
 "Новое нерегулярное событие" = "Neues unregelmäßiges Ereignis";
+
 //CreateHabitViewController
 "Новая привычка" = "Neue Gewohnheit";
+"Редактирование привычки" = "Gewohnheit bearbeiten";
+"Сохранить" = "Speichern";
 
 
 //BaseTrackerCreationViewController

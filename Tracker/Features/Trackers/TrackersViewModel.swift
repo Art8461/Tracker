@@ -149,6 +149,10 @@ final class TrackersViewModel: NSObject {
         categoryStore.categories.map { $0.title }
     }
     
+    func categoryTitle(for tracker: Tracker) -> String? {
+        trackerStore.categoryTitle(for: tracker.id)
+    }
+    
     func createTracker(_ tracker: Tracker, in categoryTitle: String) {
         do {
             if categoryStore.categories.contains(where: { $0.title.caseInsensitiveCompare(categoryTitle) == .orderedSame }) == false {
@@ -158,6 +162,18 @@ final class TrackersViewModel: NSObject {
             applyFilters()
         } catch {
             assertionFailure("Failed to create tracker: \(error)")
+        }
+    }
+    
+    func updateTracker(_ tracker: Tracker, in categoryTitle: String) {
+        do {
+            if categoryStore.categories.contains(where: { $0.title.caseInsensitiveCompare(categoryTitle) == .orderedSame }) == false {
+                try categoryStore.createCategory(title: categoryTitle)
+            }
+            try trackerStore.updateTracker(tracker, in: categoryTitle)
+            applyFilters()
+        } catch {
+            assertionFailure("Failed to update tracker: \(error)")
         }
     }
     
@@ -264,7 +280,7 @@ final class TrackersViewModel: NSObject {
         calendar.startOfDay(for: date)
     }
     
-    private func completedCount(for tracker: Tracker) -> Int {
+    func completedCount(for tracker: Tracker) -> Int {
         recordStore.records.filter { $0.trackerId == tracker.id }.count
     }
     

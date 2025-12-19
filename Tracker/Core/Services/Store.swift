@@ -201,6 +201,41 @@ final class TrackerStore: CoreDataStore<TrackerEntity> {
         }
     }
     
+    func updateTracker(_ tracker: Tracker, in categoryTitle: String) throws {
+        try context.performAndWait {
+            guard let entity = try fetchTrackerEntity(id: tracker.id) else {
+                throw TrackerStoreError.trackerNotFound
+            }
+            guard let category = try fetchCategoryEntity(title: categoryTitle) else {
+                throw TrackerStoreError.categoryNotFound
+            }
+            
+            entity.title = tracker.title
+            entity.emoji = tracker.emoji
+            entity.colorHex = tracker.colorHex
+            entity.type = Int16(tracker.schedule.isEmpty ? 1 : 0)
+            entity.updatedAt = Date()
+            entity.isPinned = tracker.isPinned
+            entity.category = category
+            
+            if let items = entity.scheduleItems as? Set<TrackerScheduleItemEntity> {
+                items.forEach { context.delete($0) }
+            }
+            
+            for weekday in tracker.schedule {
+                let item = TrackerScheduleItemEntity(context: context)
+                item.weekday = Int16(weekday.rawValue)
+                item.tracker = entity
+            }
+            
+            try saveContextIfNeeded()
+        }
+    }
+    
+    func categoryTitle(for trackerId: UUID) -> String? {
+        categoryFor(trackerId: trackerId)
+    }
+    
     private func fetchTrackerEntity(id: UUID) throws -> TrackerEntity? {
         let request: NSFetchRequest<TrackerEntity> = TrackerEntity.fetchRequest()
         request.predicate = NSPredicate(format: "id == %@", id as CVarArg)

@@ -313,6 +313,32 @@ final class TrackersViewController: UIViewController{
         
         present(alert, animated: true)
     }
+    
+    private func presentEdit(for tracker: Tracker) {
+        guard let categoryTitle = viewModel.categoryTitle(for: tracker) else {
+            return
+        }
+        let availableCategories = viewModel.availableCategoryTitles()
+        let controller: UIViewController
+        if tracker.schedule.isEmpty {
+            let vc = EditIrregularViewController(tracker: tracker,
+                                                 categoryTitle: categoryTitle,
+                                                 availableCategories: availableCategories)
+            vc.editingDelegate = self
+            controller = vc
+        } else {
+            let daysCount = viewModel.completedCount(for: tracker)
+            let vc = EditHabitViewController(tracker: tracker,
+                                             categoryTitle: categoryTitle,
+                                             availableCategories: availableCategories,
+                                             daysCount: daysCount)
+            vc.editingDelegate = self
+            controller = vc
+        }
+        let nav = UINavigationController(rootViewController: controller)
+        nav.modalPresentationStyle = .pageSheet
+        present(nav, animated: true)
+    }
 
   }
 
@@ -387,7 +413,7 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
             let editAction = UIAction(
                 title: NSLocalizedString("Редактировать", comment: "Edit tracker action")
             ) { _ in
-                // Placeholder for future edit implementation
+                self?.presentEdit(for: tracker)
             }
             
             let deleteAction = UIAction(
@@ -437,6 +463,12 @@ extension TrackersViewController: UISearchBarDelegate {
 extension TrackersViewController: TrackerCreationDelegate {
     func trackerCreationDidCreate(_ tracker: Tracker, in categoryTitle: String) {
         viewModel.createTracker(tracker, in: categoryTitle)
+    }
+}
+
+extension TrackersViewController: TrackerEditingDelegate {
+    func trackerEditingDidUpdate(_ tracker: Tracker, in categoryTitle: String) {
+        viewModel.updateTracker(tracker, in: categoryTitle)
     }
 }
 

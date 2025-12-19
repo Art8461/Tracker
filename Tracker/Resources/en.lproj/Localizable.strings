@@ -57,8 +57,11 @@
 
 //CreateIrregularViewController
 "Новое нерегулярное событие" = "New irregular event";
+
 //CreateHabitViewController
 "Новая привычка" = "New habit";
+"Редактирование привычки" = "Edit habit";
+"Сохранить" = "Save";
 
 
 //BaseTrackerCreationViewController
