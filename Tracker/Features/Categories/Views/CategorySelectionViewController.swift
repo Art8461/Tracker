@@ -228,6 +228,51 @@ final class CategorySelectionViewController: UIViewController {
         dismiss(animated: true)
     }
     
+    private func presentDeleteConfirmation(for category: String, at indexPath: IndexPath) {
+        let alert = UIAlertController(
+            title: nil,
+            message: NSLocalizedString("Эта категория точно не нужна?", comment: "Delete category confirmation"),
+            preferredStyle: .actionSheet
+        )
+        let deleteAction = UIAlertAction(
+            title: NSLocalizedString("Удалить", comment: "Delete category"),
+            style: .destructive
+        ) { [weak self] _ in
+            self?.viewModel.deleteCategory(title: category)
+        }
+        let cancelAction = UIAlertAction(
+            title: NSLocalizedString("Отмена", comment: "Cancel action"),
+            style: .cancel
+        )
+        
+        alert.addAction(deleteAction)
+        alert.addAction(cancelAction)
+        
+        if let popover = alert.popoverPresentationController,
+           let cell = tableView.cellForRow(at: indexPath) {
+            popover.sourceView = cell
+            popover.sourceRect = cell.bounds
+        } else if let popover = alert.popoverPresentationController {
+            popover.sourceView = view
+            popover.sourceRect = CGRect(
+                x: view.bounds.midX,
+                y: view.bounds.midY,
+                width: 1,
+                height: 1
+            )
+        }
+        
+        present(alert, animated: true)
+    }
+    
+    private func presentEditCategory(for category: String) {
+        let editVC = EditCategoryViewController(currentTitle: category)
+        editVC.delegate = self
+        let nav = UINavigationController(rootViewController: editVC)
+        nav.modalPresentationStyle = .pageSheet
+        present(nav, animated: true)
+    }
+    
     private func presentError(_ message: String) {
         let alert = UIAlertController(
             title: NSLocalizedString("Ошибка", comment: "Category error title"),
@@ -281,6 +326,30 @@ extension CategorySelectionViewController: UITableViewDelegate {
         return 75
     }
     
+    func tableView(_ tableView: UITableView,
+                   contextMenuConfigurationForRowAt indexPath: IndexPath,
+                   point: CGPoint) -> UIContextMenuConfiguration? {
+        guard indexPath.row < state.categories.count else { return nil }
+        let category = state.categories[indexPath.row]
+        
+        return UIContextMenuConfiguration(identifier: indexPath as NSIndexPath, previewProvider: nil) { [weak self] _ in
+            let editAction = UIAction(
+                title: NSLocalizedString("Редактировать", comment: "Edit category action")
+            ) { [weak self] _ in
+                self?.presentEditCategory(for: category)
+            }
+            
+            let deleteAction = UIAction(
+                title: NSLocalizedString("Удалить", comment: "Delete category action"),
+                attributes: .destructive
+            ) { _ in
+                self?.presentDeleteConfirmation(for: category, at: indexPath)
+            }
+            
+            return UIMenu(children: [editAction, deleteAction])
+        }
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         viewModel.selectCategory(at: indexPath.row)
@@ -293,5 +362,15 @@ extension CategorySelectionViewController: NewCategoryViewControllerDelegate {
     func newCategoryViewController(_ viewController: NewCategoryViewController,
                                  didCreate category: String) {
         viewModel.createCategory(category)
+    }
+}
+
+// MARK: - EditCategoryViewControllerDelegate
+
+extension CategorySelectionViewController: EditCategoryViewControllerDelegate {
+    func editCategoryViewController(_ viewController: EditCategoryViewController,
+                                    didUpdateFrom oldTitle: String,
+                                    to newTitle: String) {
+        viewModel.updateCategory(oldTitle: oldTitle, newTitle: newTitle)
     }
 }

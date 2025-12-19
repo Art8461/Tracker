@@ -317,6 +317,27 @@ final class TrackerCategoryStore: CoreDataStore<TrackerCategoryEntity> {
         }
     }
     
+    func updateCategory(from oldTitle: String, to newTitle: String) throws {
+        let normalized = newTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalized.isEmpty else {
+            throw TrackerCategoryStoreError.invalidTitle
+        }
+        
+        try context.performAndWait {
+            guard let entity = try fetchCategoryEntity(title: oldTitle) else {
+                throw TrackerCategoryStoreError.categoryNotFound
+            }
+            
+            if oldTitle.caseInsensitiveCompare(normalized) != .orderedSame,
+               try fetchCategoryEntity(title: normalized) != nil {
+                throw TrackerCategoryStoreError.duplicateTitle
+            }
+            
+            entity.title = normalized
+            try saveContextIfNeeded()
+        }
+    }
+    
     func deleteCategory(title: String) throws {
         try context.performAndWait {
             guard let entity = try fetchCategoryEntity(title: title) else {

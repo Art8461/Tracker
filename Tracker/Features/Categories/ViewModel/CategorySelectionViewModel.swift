@@ -64,6 +64,29 @@ final class CategorySelectionViewModel: NSObject {
         }
     }
     
+    func deleteCategory(at index: Int) {
+        guard index < state.categories.count else { return }
+        deleteCategory(title: state.categories[index])
+    }
+    
+    func deleteCategory(title: String) {
+        do {
+            try store.deleteCategory(title: title)
+            reloadCategories()
+        } catch {
+            handle(error: error)
+        }
+    }
+    
+    func updateCategory(oldTitle: String, newTitle: String) {
+        do {
+            try store.updateCategory(from: oldTitle, to: newTitle)
+            reloadCategories()
+        } catch {
+            handle(error: error)
+        }
+    }
+    
     private func reloadCategories() {
         let titles = store.categories.map { $0.title }
         let selected = state.selectedCategory.flatMap { selectedTitle in

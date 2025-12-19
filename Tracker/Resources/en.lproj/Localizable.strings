@@ -79,6 +79,8 @@
 //CategorySelectionViewController
 "Добавить категорию" = "Add category";
 "Привычки и события можно\nобъединить по смыслу" = "Habits and events can be united by meaning";
+"Эта категория точно не нужна?" = "Are you sure you want to delete this category?";
+"Редактирование категории" = "Edit category";
 "Ошибка" = "Error";
 "OK" = "OK";
 
