@@ -15,7 +15,6 @@ final class TrackersViewController: UIViewController{
         let picker = UIDatePicker()
         picker.datePickerMode = .date
         picker.preferredDatePickerStyle = .compact
-        picker.locale = Locale(identifier: "ru_RU")
         picker.translatesAutoresizingMaskIntoConstraints = false
         picker.widthAnchor.constraint(equalToConstant: 110).isActive = true
         picker.heightAnchor.constraint(equalToConstant: 34).isActive = true
