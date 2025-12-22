@@ -10,6 +10,9 @@ import UIKit
 final class TrackerCell: UICollectionViewCell {
     static let identifier = "TrackerCell"
     
+    /// View to use for context menu highlight/preview (color block only)
+    var contextPreviewTargetView: UIView { colorView }
+    
     // MARK: - UI
     
     private let containerView: UIView = {
@@ -40,7 +43,7 @@ final class TrackerCell: UICollectionViewCell {
     private let emojiBackground: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        let baseColor = UIColor(named: "AppWhite") ?? UIColor.white
+        let baseColor = UIColor(resource: .appWhite)
         view.backgroundColor = baseColor.withAlphaComponent(0.3)
         view.layer.cornerRadius = 12
         view.layer.masksToBounds = true
@@ -52,6 +55,12 @@ final class TrackerCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 12)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    private let pinImageView: UIImageView = {
+        let iv = UIImageView(image: UIImage(resource: .pin))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
     }()
     
     private let titleLabel: UILabel = {
@@ -101,6 +110,7 @@ final class TrackerCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         plusAction = nil
+        pinImageView.isHidden = true
     }
     
     override func layoutSubviews() {
@@ -116,6 +126,7 @@ final class TrackerCell: UICollectionViewCell {
         containerView.addSubview(footerView)
         colorView.addSubview(emojiBackground)
         emojiBackground.addSubview(emojiLabel)
+        colorView.addSubview(pinImageView)
         colorView.addSubview(titleLabel)
         footerView.addSubview(daysLabel)
         footerView.addSubview(plusButton)
@@ -145,6 +156,9 @@ final class TrackerCell: UICollectionViewCell {
             emojiLabel.centerXAnchor.constraint(equalTo: emojiBackground.centerXAnchor),
             emojiLabel.centerYAnchor.constraint(equalTo: emojiBackground.centerYAnchor),
             
+            pinImageView.topAnchor.constraint(equalTo: colorView.topAnchor, constant: 12),
+            pinImageView.trailingAnchor.constraint(equalTo: colorView.trailingAnchor, constant: -4),
+            
             titleLabel.leadingAnchor.constraint(equalTo: colorView.leadingAnchor, constant: 12),
             titleLabel.trailingAnchor.constraint(equalTo: colorView.trailingAnchor, constant: -12),
             titleLabel.bottomAnchor.constraint(equalTo: colorView.bottomAnchor, constant: -12),
@@ -168,6 +182,7 @@ final class TrackerCell: UICollectionViewCell {
         titleLabel.text = tracker.title
         emojiLabel.text = tracker.emoji
         daysLabel.text = daysText
+        pinImageView.isHidden = !tracker.isPinned
         updatePlusButton(color: color, isCompleted: isCompleted, isEnabled: isButtonEnabled)
     }
     

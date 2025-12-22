@@ -40,7 +40,10 @@ class BaseTrackerCreationViewController: UIViewController {
         textField.layer.cornerRadius = 16
         textField.clearButtonMode = .whileEditing
         textField.returnKeyType = .done
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = NSLocalizedString(
+            "Введите название трекера",
+            comment: "Placeholder for tracker name field"
+        )
         textField.delegate = self
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.addTarget(self, action: #selector(nameFieldEditingChanged), for: .editingChanged)
@@ -81,7 +84,7 @@ class BaseTrackerCreationViewController: UIViewController {
     
     let colorTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Цвет"
+        label.text = NSLocalizedString("Цвет", comment: "Color title label")
         label.font = .systemFont(ofSize: 19, weight: .bold)
         label.textColor = UIColor(resource: .appBlack)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -107,7 +110,7 @@ class BaseTrackerCreationViewController: UIViewController {
     
     let characterLimitLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = NSLocalizedString("Ограничение 38 символов", comment: "Name character limit message")
         label.font = .systemFont(ofSize: 17)
         label.textColor = UIColor(resource: .appRed)
         label.textAlignment = .center
@@ -125,7 +128,10 @@ class BaseTrackerCreationViewController: UIViewController {
     }()
     
     lazy var categoryButton: UIButton = {
-        let button = createSelectionButton(title: "Категория", subtitle: nil)
+        let button = createSelectionButton(
+            title: NSLocalizedString("Категория", comment: "Category selection button"),
+            subtitle: nil
+        )
         button.addTarget(self, action: #selector(categoryTapped), for: .touchUpInside)
         button.backgroundColor = UIColor(resource: .appGrayOsn)
         button.layer.cornerRadius = 16
@@ -134,7 +140,7 @@ class BaseTrackerCreationViewController: UIViewController {
     
     lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(NSLocalizedString("Отменить", comment: "Cancel creation"), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.systemRed, for: .normal)
         button.backgroundColor = UIColor(resource: .appWhite)
@@ -148,7 +154,7 @@ class BaseTrackerCreationViewController: UIViewController {
     
     lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(NSLocalizedString("Создать", comment: "Create tracker"), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor(resource: .appWhite), for: .normal)
         button.setTitleColor(.white, for: .disabled)
@@ -216,6 +222,16 @@ class BaseTrackerCreationViewController: UIViewController {
         return categoryButton
     }
     
+    /// Элемент, от которого отталкивается поле имени
+    func nameTopAnchorView() -> UIView {
+        return titleLabel
+    }
+    
+    /// Отступ от элемента nameTopAnchorView до поля имени
+    func getNameTopSpacing() -> CGFloat {
+        return 38
+    }
+    
     /// Метод для получения отступа сверху для emojiTitleLabel
     func getEmojiTitleTopSpacing() -> CGFloat {
         return 32
@@ -263,7 +279,8 @@ class BaseTrackerCreationViewController: UIViewController {
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 27),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
-            nameContainer.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
+            nameContainer.topAnchor.constraint(equalTo: nameTopAnchorView().bottomAnchor,
+                                               constant: getNameTopSpacing()),
             nameContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             nameContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             nameTextField.heightAnchor.constraint(equalToConstant: 75),
