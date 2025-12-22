@@ -9,11 +9,13 @@ import Foundation
 import AppMetricaCore
 
 struct AnalyticsService {
+    private static let logger = LoggingService.makeLogger(label: "tracker.analytics")
+    
     static func activate() {
         guard
             let rawKey = Bundle.main.object(forInfoDictionaryKey: "AppMetricaAPIKey") as? String
         else {
-            print("AnalyticsService: missing AppMetricaAPIKey")
+            logger.error("Missing AppMetricaAPIKey in Info.plist")
             return
         }
         
@@ -25,7 +27,7 @@ struct AnalyticsService {
             apiKey != "YOUR_APP_METRICA_API_KEY",
             let configuration = AppMetricaConfiguration(apiKey: apiKey)
         else {
-            print("AnalyticsService: missing AppMetricaAPIKey")
+            logger.error("Invalid AppMetricaAPIKey value")
             return
         }
         
@@ -34,7 +36,7 @@ struct AnalyticsService {
     
     func report(event: String, params : [AnyHashable : Any]) {
         AppMetrica.reportEvent(name: event, parameters: params, onFailure: { error in
-            print("REPORT ERROR: %@", error.localizedDescription)
+            Self.logger.error("Failed to report event: \(error.localizedDescription)")
         })
     }
 }

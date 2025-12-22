@@ -17,6 +17,8 @@
 		285E79F62EF66F6F002A6FA5 /* InlineSnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 285E79F52EF66F6F002A6FA5 /* InlineSnapshotTesting */; };
 		285E79F82EF66F6F002A6FA5 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 285E79F72EF66F6F002A6FA5 /* SnapshotTesting */; };
 		285E79FA2EF66F6F002A6FA5 /* SnapshotTestingCustomDump in Frameworks */ = {isa = PBXBuildFile; productRef = 285E79F92EF66F6F002A6FA5 /* SnapshotTestingCustomDump */; settings = {ATTRIBUTES = (Required, ); }; };
+		28E4A5062EF91ED3003C8DD0 /* InMemoryLogging in Frameworks */ = {isa = PBXBuildFile; productRef = 28E4A5052EF91ED3003C8DD0 /* InMemoryLogging */; };
+		28E4A5082EF91ED3003C8DD0 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 28E4A5072EF91ED3003C8DD0 /* Logging */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,12 +79,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				28E4A5082EF91ED3003C8DD0 /* Logging in Frameworks */,
 				285E77302EF5D0F8002A6FA5 /* AppMetricaScreenshot in Frameworks */,
 				285E772C2EF5D0F8002A6FA5 /* AppMetricaIDSync in Frameworks */,
 				285E772E2EF5D0F8002A6FA5 /* AppMetricaLibraryAdapter in Frameworks */,
 				285E77322EF5D0F8002A6FA5 /* AppMetricaWebKit in Frameworks */,
 				285E772A2EF5D0F8002A6FA5 /* AppMetricaCrashes in Frameworks */,
 				285E77262EF5D0F8002A6FA5 /* AppMetricaAdSupport in Frameworks */,
+				28E4A5062EF91ED3003C8DD0 /* InMemoryLogging in Frameworks */,
 				285E77282EF5D0F8002A6FA5 /* AppMetricaCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -164,6 +168,8 @@
 				285E772D2EF5D0F8002A6FA5 /* AppMetricaLibraryAdapter */,
 				285E772F2EF5D0F8002A6FA5 /* AppMetricaScreenshot */,
 				285E77312EF5D0F8002A6FA5 /* AppMetricaWebKit */,
+				28E4A5052EF91ED3003C8DD0 /* InMemoryLogging */,
+				28E4A5072EF91ED3003C8DD0 /* Logging */,
 			);
 			productName = Tracker;
 			productReference = 286E29102EC9F2760099A8FD /* Tracker.app */;
@@ -202,6 +208,7 @@
 			packageReferences = (
 				285E77242EF5D0F8002A6FA5 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */,
 				285E79F42EF66F6F002A6FA5 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
+				28E4A5042EF91ED2003C8DD0 /* XCRemoteSwiftPackageReference "swift-log" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 286E29112EC9F2760099A8FD /* Products */;
@@ -535,6 +542,14 @@
 				minimumVersion = 1.18.7;
 			};
 		};
+		28E4A5042EF91ED2003C8DD0 /* XCRemoteSwiftPackageReference "swift-log" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-log.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.8.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -587,6 +602,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 285E79F42EF66F6F002A6FA5 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTestingCustomDump;
+		};
+		28E4A5052EF91ED3003C8DD0 /* InMemoryLogging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 28E4A5042EF91ED2003C8DD0 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = InMemoryLogging;
+		};
+		28E4A5072EF91ED3003C8DD0 /* Logging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 28E4A5042EF91ED2003C8DD0 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = Logging;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

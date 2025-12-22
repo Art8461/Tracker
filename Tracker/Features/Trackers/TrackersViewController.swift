@@ -101,6 +101,7 @@ final class TrackersViewController: UIViewController{
 
     private let viewModel = TrackersViewModel()
     private let analyticsService = AnalyticsService()
+    private let logger = LoggingService.makeLogger(label: "tracker.ui.trackers")
     private let filterButtonHeight: CGFloat = 50
     
     private func configureNavigationBar() {
@@ -478,7 +479,7 @@ extension TrackersViewController: UISearchBarDelegate {
         }
         
         analyticsService.report(event: "main_screen_event", params: params)
-        print("Analytics event:", params)
+        logger.info("Analytics event: \(params)")
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {

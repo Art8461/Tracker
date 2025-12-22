@@ -1,5 +1,5 @@
 {
-  "originHash" : "8106d6f3cccd33e2eeab8ae7fa43cccb647a6d03cbd8bb2c923af4cf1558a3fc",
+  "originHash" : "f1ef6f41256a91675b513b16aa8985e544a34432c2e31538435a7d8556073847",
   "pins" : [
     {
       "identity" : "appmetrica-sdk-ios",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "82645ec760917961cfa08c9c0c7104a57a0fa4b1",
         "version" : "1.3.3"
+      }
+    },
+    {
+      "identity" : "swift-log",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-log.git",
+      "state" : {
+        "revision" : "bc386b95f2a16ccd0150a8235e7c69eab2b866ca",
+        "version" : "1.8.0"
       }
     },
     {
