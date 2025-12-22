@@ -22,7 +22,7 @@ struct AnalyticsService {
         let apiKey = rawKey.trimmingCharacters(in: .whitespacesAndNewlines)
         
         guard
-            apiKey.isEmpty == false,
+            !apiKey.isEmpty,
             apiKey != "REPLACE_ME",
             apiKey != "YOUR_APP_METRICA_API_KEY",
             let configuration = AppMetricaConfiguration(apiKey: apiKey)
@@ -34,7 +34,7 @@ struct AnalyticsService {
         AppMetrica.activate(with: configuration)
     }
     
-    func report(event: String, params : [AnyHashable : Any]) {
+    static func report(event: String, params : [AnyHashable : Any]) {
         AppMetrica.reportEvent(name: event, parameters: params, onFailure: { error in
             Self.logger.error("Failed to report event: \(error.localizedDescription)")
         })

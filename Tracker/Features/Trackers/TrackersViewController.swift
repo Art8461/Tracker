@@ -100,7 +100,6 @@ final class TrackersViewController: UIViewController{
     }()
 
     private let viewModel = TrackersViewModel()
-    private let analyticsService = AnalyticsService()
     private let logger = LoggingService.makeLogger(label: "tracker.ui.trackers")
     private let filterButtonHeight: CGFloat = 50
     
@@ -478,7 +477,7 @@ extension TrackersViewController: UISearchBarDelegate {
             params["item"] = item
         }
         
-        analyticsService.report(event: "main_screen_event", params: params)
+        AnalyticsService.report(event: "main_screen_event", params: params)
         logger.info("Analytics event: \(params)")
     }
     

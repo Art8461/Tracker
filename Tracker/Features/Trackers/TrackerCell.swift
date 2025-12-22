@@ -182,7 +182,7 @@ final class TrackerCell: UICollectionViewCell {
         titleLabel.text = tracker.title
         emojiLabel.text = tracker.emoji
         daysLabel.text = daysText
-        pinImageView.isHidden = tracker.isPinned == false
+        pinImageView.isHidden = !tracker.isPinned
         updatePlusButton(color: color, isCompleted: isCompleted, isEnabled: isButtonEnabled)
     }
     
